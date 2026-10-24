@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "unified",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8922"],
+      "port": 8922
+    }
+  ]
+}
