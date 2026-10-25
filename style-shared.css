@@ -131,17 +131,17 @@ body {
 }
 
 /* Khung chuyển đổi Kho NVL / Sản Xuất - chỉ hiện với tài khoản he_thong=ALL */
+/* Nằm thành 1 thanh riêng trên cùng (không nổi đè) để không che tên người dùng / nút Thoát ở header */
 #system-switcher {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 10000;
+  position: relative;
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 6px;
   background: #fff;
-  padding: 6px;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  padding: 6px 12px;
+  border-bottom: 1px solid #dbe3ec;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 #system-switcher button {

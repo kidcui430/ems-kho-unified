@@ -182,9 +182,12 @@ export function bindKhoEvents() {
   el("addSupplierBtn").addEventListener("click", function () {
     addSupplier(loadBootstrap);
   });
-  el("addProductBtn").addEventListener("click", function () {
-    addProduct(loadBootstrap);
-  });
+  // Form "Thêm mã hàng" đã chuyển sang bên Sản Xuất, nút này có thể không còn trong HTML
+  if (el("addProductBtn")) {
+    el("addProductBtn").addEventListener("click", function () {
+      addProduct(loadBootstrap);
+    });
+  }
 
   if (el("supplierSearch")) el("supplierSearch").addEventListener("input", renderSuppliers);
   if (el("productSearch")) el("productSearch").addEventListener("input", renderProducts);

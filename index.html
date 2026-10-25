@@ -9,7 +9,10 @@
     <!-- Thư viện dùng chung: Excel, Biểu đồ, Date picker -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
   </head>
   <body>
     <!-- ============================================================
@@ -44,7 +47,8 @@
           <p id="login-error" class="text-error hidden"></p>
         </form>
         <p class="demo-note">
-          Kho: ADMIN/123 · VP01/123 · XUONG01/123 &nbsp;|&nbsp; Sản xuất: LEADER_NC/123
+          Kho: ADMIN/123 · VP01/123 · XUONG01/123 &nbsp;|&nbsp; Sản xuất:
+          LEADER_NC/123
         </p>
       </div>
 
@@ -67,22 +71,39 @@
         <div class="login-card" style="width: min(100%, 340px)">
           <h2 style="margin-bottom: 10px">Yêu Cầu Đổi Mật Khẩu</h2>
           <p style="font-size: 13px; color: #555; margin-bottom: 15px">
-            Tài khoản của bạn đang dùng mật khẩu tạm, vui lòng đổi mật khẩu mới để tiếp tục.
+            Tài khoản của bạn đang dùng mật khẩu tạm, vui lòng đổi mật khẩu mới
+            để tiếp tục.
           </p>
           <div class="input-group">
             <label for="new-password">Mật khẩu mới</label>
-            <input type="password" id="new-password" placeholder="Tối thiểu 4 ký tự..." />
+            <input
+              type="password"
+              id="new-password"
+              placeholder="Tối thiểu 4 ký tự..."
+            />
           </div>
-          <button type="button" onclick="submitNewPassword()">Lưu & Đăng Nhập</button>
+          <button type="button" onclick="submitNewPassword()">
+            Lưu & Đăng Nhập
+          </button>
         </div>
       </div>
     </section>
 
     <!-- Khung chuyển đổi Kho NVL / Sản Xuất, chỉ hiện với tài khoản he_thong=ALL -->
     <div id="system-switcher" class="hidden">
-      <button type="button" id="switchToKhoBtn" onclick="switchSystem('KHO')">Kho NVL</button>
-      <button type="button" id="switchToSxBtn" onclick="switchSystem('SX')">Sản Xuất</button>
-      <button type="button" onclick="logout()" style="background: #fff2f3; color: #a8323a">Thoát</button>
+      <button type="button" id="switchToKhoBtn" onclick="switchSystem('KHO')">
+        Kho NVL
+      </button>
+      <button type="button" id="switchToSxBtn" onclick="switchSystem('SX')">
+        Sản Xuất
+      </button>
+      <button
+        type="button"
+        onclick="logout()"
+        style="background: #fff2f3; color: #a8323a"
+      >
+        Thoát
+      </button>
     </div>
 
     <!-- ============================================================
@@ -103,29 +124,54 @@
         </header>
 
         <nav class="nav-menu">
-          <button class="nav-btn active" data-tab="tab-giaodich" id="navGiaoDich">Nhập / Xuất Kho</button>
+          <button
+            class="nav-btn active"
+            data-tab="tab-giaodich"
+            id="navGiaoDich"
+          >
+            Nhập / Xuất Kho
+          </button>
           <button class="nav-btn" data-tab="tab-vattu">Tồn kho NVL</button>
-          <button class="nav-btn vp-only" data-tab="tab-baocao">Báo cáo & Biểu đồ</button>
-          <button class="nav-btn vp-only" data-tab="tab-sanpham">Mã hàng SX & BOM</button>
-          <button class="nav-btn vp-only" data-tab="tab-ncc">Nhà cung cấp</button>
+          <button class="nav-btn vp-only" data-tab="tab-baocao">
+            Báo cáo & Biểu đồ
+          </button>
+          <button class="nav-btn vp-only" data-tab="tab-sanpham">
+            Mã hàng SX & BOM
+          </button>
+          <button class="nav-btn vp-only" data-tab="tab-ncc">
+            Nhà cung cấp
+          </button>
         </nav>
 
         <main class="container">
           <!-- TAB 1: GIAO DỊCH NHẬP / XUẤT -->
           <section id="tab-giaodich" class="tab-content">
             <div class="sub-nav">
-              <button class="sub-btn active" data-sub="tx-create">Tạo phiếu Nhập / Xuất</button>
-              <button class="sub-btn" data-sub="tx-history">Lịch sử & In Phiếu Ngày</button>
+              <button class="sub-btn active" data-sub="tx-create">
+                Tạo phiếu Nhập / Xuất
+              </button>
+              <button class="sub-btn" data-sub="tx-history">
+                Lịch sử & In Phiếu Ngày
+              </button>
             </div>
 
             <div id="tx-create" class="sub-content">
               <div class="card" style="padding-top: 16px">
                 <div class="form-grid two-col" style="margin-bottom: 12px">
-                  <label>Loại giao dịch <select id="typeSelect"></select></label>
-                  <label>Ngày giao dịch <input type="date" id="txDate" /></label>
+                  <label
+                    >Loại giao dịch
+                    <select id="typeSelect"></select
+                  ></label>
+                  <label
+                    >Ngày giao dịch <input type="date" id="txDate"
+                  /></label>
                 </div>
 
-                <div id="productWrap" class="hidden" style="margin-bottom: 14px">
+                <div
+                  id="productWrap"
+                  class="hidden"
+                  style="margin-bottom: 14px"
+                >
                   <label>
                     Mã hàng sản xuất (Xuất cho đơn hàng / sản phẩm nào?)
                     <select id="productSelect">
@@ -136,21 +182,61 @@
                   <div id="bomSuggestPanel" class="bom-panel hidden">
                     <div class="flex-between" style="margin-bottom: 8px">
                       <div>
-                        <strong style="color: var(--navy); font-size: 14px">📋 Bảng tra cứu Định mức BOM (Tham khảo)</strong>
-                        <span class="text-muted" style="font-size: 12px; display: block">
-                          Chỉ dùng để gợi ý nhanh NVL cho sản phẩm này, bạn vẫn có thể chọn NVL hoặc số lượng bất kỳ bên dưới.
+                        <strong style="color: var(--navy); font-size: 14px"
+                          >📋 Bảng tra cứu Định mức BOM (Tham khảo)</strong
+                        >
+                        <span
+                          class="text-muted"
+                          style="font-size: 12px; display: block"
+                        >
+                          Chỉ dùng để gợi ý nhanh NVL cho sản phẩm này, bạn vẫn
+                          có thể chọn NVL hoặc số lượng bất kỳ bên dưới.
                         </span>
                       </div>
-                      <div class="vp-only" style="display: flex; align-items: center; gap: 8px">
-                        <span style="font-size: 12px; font-weight: 600">SL Thành phẩm dự kiến:</span>
-                        <input type="number" id="bomTargetQty" value="1" min="1" step="any" style="width: 90px; min-height: 34px; padding: 4px 8px" />
-                        <button type="button" id="addAllBomBtn" class="btn-sm success" title="Đổ toàn bộ danh sách BOM bên dưới vào Phiếu tạm">+ Nạp tất cả vào phiếu</button>
+                      <div
+                        class="vp-only"
+                        style="display: flex; align-items: center; gap: 8px"
+                      >
+                        <span style="font-size: 12px; font-weight: 600"
+                          >SL Thành phẩm dự kiến:</span
+                        >
+                        <input
+                          type="number"
+                          id="bomTargetQty"
+                          value="1"
+                          min="1"
+                          step="any"
+                          style="
+                            width: 90px;
+                            min-height: 34px;
+                            padding: 4px 8px;
+                          "
+                        />
+                        <button
+                          type="button"
+                          id="addAllBomBtn"
+                          class="btn-sm success"
+                          title="Đổ toàn bộ danh sách BOM bên dưới vào Phiếu tạm"
+                        >
+                          + Nạp tất cả vào phiếu
+                        </button>
                       </div>
                     </div>
                     <div class="table-responsive">
-                      <table id="bomSuggestTable" style="min-width: 550px; background: #fff">
+                      <table
+                        id="bomSuggestTable"
+                        style="min-width: 550px; background: #fff"
+                      >
                         <thead>
-                          <tr><th>Mã NVL</th><th>Tên NVL</th><th>ĐVT</th><th>Định mức / 1 SP</th><th>SL Gợi ý xuất</th><th>Tồn hiện tại</th><th>Thao tác</th></tr>
+                          <tr>
+                            <th>Mã NVL</th>
+                            <th>Tên NVL</th>
+                            <th>ĐVT</th>
+                            <th>Định mức / 1 SP</th>
+                            <th>SL Gợi ý xuất</th>
+                            <th>Tồn hiện tại</th>
+                            <th>Thao tác</th>
+                          </tr>
                         </thead>
                         <tbody></tbody>
                       </table>
@@ -159,66 +245,226 @@
                 </div>
 
                 <div class="form-grid two-col">
-                  <label>Phân loại NVL <select id="categorySelect"><option value="">-- Chọn phân loại --</option></select></label>
-                  <label>Nguyên vật liệu (NVL) <select id="itemSelect" disabled><option value="">-- Chọn NVL --</option></select></label>
+                  <label
+                    >Phân loại NVL
+                    <select id="categorySelect">
+                      <option value="">-- Chọn phân loại --</option>
+                    </select></label
+                  >
+                  <label
+                    >Nguyên vật liệu (NVL)
+                    <select id="itemSelect" disabled>
+                      <option value="">-- Chọn NVL --</option>
+                    </select></label
+                  >
                 </div>
 
-                <div id="stockPanel" class="stock-panel hidden" style="grid-template-columns: repeat(3, 1fr)">
-                  <div><span>Tồn kho hiện tại</span><strong id="stockWarehouse">0</strong></div>
-                  <div><span>ĐVT Chuẩn</span><strong id="stockUnit">-</strong></div>
-                  <div><span>Trạng thái / Định mức</span><strong id="stockStatus">-</strong></div>
-                </div>
-
-                <!-- NVL dạng cây thép (he_so_kg_m > 0): nội dung đổi theo loại GD -->
-                <div id="caySteelPanel" class="hidden" style="margin-bottom: 12px; padding: 12px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px">
-                  <!-- Mode NHẬP KHO: nhập chiều dài mỗi cây, tự tính tổng Kg từ Số lượng (số cây) -->
-                  <div id="caySteelImportMode" class="hidden">
-                    <label>Chiều dài mỗi cây (m) <input type="number" id="caySteelLengthInput" min="0" step="any" placeholder="VD: 6" /></label>
-                    <small class="text-muted" id="caySteelImportHint" style="display: block"></small>
+                <div
+                  id="stockPanel"
+                  class="stock-panel hidden"
+                  style="grid-template-columns: repeat(3, 1fr)"
+                >
+                  <div>
+                    <span>Tồn kho hiện tại</span
+                    ><strong id="stockWarehouse">0</strong>
                   </div>
+                  <div>
+                    <span>ĐVT Chuẩn</span><strong id="stockUnit">-</strong>
+                  </div>
+                  <div>
+                    <span>Trạng thái / Định mức</span
+                    ><strong id="stockStatus">-</strong>
+                  </div>
+                </div>
+
+                <!-- Khung Quy đổi Cây / Mét / Tỷ lệ cắt (pcs) & Nhập Số Kg -->
+                <div
+                  id="caySteelPanel"
+                  class="hidden"
+                  style="
+                    margin-bottom: 12px;
+                    padding: 12px;
+                    background: #f0f9ff;
+                    border: 1px solid #bae6fd;
+                    border-radius: 8px;
+                  "
+                >
+                  <!-- Mode NHẬP KHO: hiện quy cách 1 cây = X mét và ô nhập Số Kg thực tế -->
+                  <div id="caySteelImportMode" class="hidden">
+                    <div class="form-grid two-col" style="margin-bottom: 6px">
+                      <label id="caySteelLengthWrap">
+                        Chiều dài 1 cây (m)
+                        <small class="text-muted"
+                          >(1 cây = bao nhiêu mét)</small
+                        >
+                        <input
+                          type="number"
+                          id="caySteelLengthInput"
+                          min="0"
+                          step="any"
+                          placeholder="VD: 6"
+                        />
+                      </label>
+                      <label>
+                        Tổng khối lượng cân thực tế (Kg)
+                        <input
+                          type="number"
+                          id="txKgInput"
+                          min="0"
+                          step="any"
+                          placeholder="Nhập số Kg (hoặc tự tính từ số cây)..."
+                        />
+                      </label>
+                    </div>
+                    <small
+                      class="text-muted"
+                      id="caySteelImportHint"
+                      style="display: block; color: #0369a1; font-weight: 600"
+                    ></small>
+                  </div>
+
                   <!-- Mode XUẤT SX theo tỷ lệ cắt đã khai báo cho Mã SP -->
                   <div id="caySteelRatioMode" class="hidden">
-                    <small class="text-muted" id="caySteelRatioHint" style="display: block; margin-bottom: 6px"></small>
-                    <label>Số con cần sản xuất <small class="text-muted">- để trống nếu muốn tự nhập thẳng Số cây ở dưới</small>
-                      <input type="number" id="caySteelConInput" min="0" step="any" placeholder="VD: 150" />
-                    </label>
+                    <div
+                      id="caySteelRatioHint"
+                      style="
+                        margin-bottom: 8px;
+                        padding: 6px 10px;
+                        background: #e0f2fe;
+                        border-radius: 6px;
+                        color: #0c4a6e;
+                        font-weight: 600;
+                        font-size: 13px;
+                      "
+                    ></div>
+                    <div class="form-grid two-col">
+                      <label>
+                        Số con hàng (pcs) dự kiến cắt
+                        <small class="text-muted"
+                          >- gõ số pcs để tự tính Số cây, hoặc gõ Số cây ở
+                          dưới</small
+                        >
+                        <input
+                          type="number"
+                          id="caySteelConInput"
+                          min="0"
+                          step="any"
+                          placeholder="VD: 170"
+                        />
+                      </label>
+                      <label>
+                        Khối lượng xuất tương ứng (Kg)
+                        <input
+                          type="number"
+                          id="txOutKgInput"
+                          min="0"
+                          step="any"
+                          placeholder="Tự tính hoặc nhập số Kg..."
+                        />
+                      </label>
+                    </div>
                   </div>
+
                   <!-- Mode XUẤT cắt mét thủ công (chưa khai báo tỷ lệ cho Mã SP đang chọn) -->
                   <div id="caySteelMetMode" class="hidden">
                     <label>
-                      Số mét cắt ra (tự quy đổi sang <span id="cutLengthUnitHint">Kg</span>)
-                      <input type="number" id="cutLengthInput" min="0" step="any" placeholder="VD: 5.5 (mét)" />
+                      Số mét cắt ra (tự quy đổi sang
+                      <span id="cutLengthUnitHint">Cây/Kg</span>)
+                      <input
+                        type="number"
+                        id="cutLengthInput"
+                        min="0"
+                        step="any"
+                        placeholder="VD: 5.5 (mét)"
+                      />
                     </label>
-                    <small class="text-muted" id="cutLengthHint" style="display: block"></small>
+                    <small
+                      class="text-muted"
+                      id="cutLengthHint"
+                      style="display: block"
+                    ></small>
                   </div>
                 </div>
 
                 <div class="form-grid two-col">
-                  <label>Số lượng (ĐVT Chuẩn) <input type="number" id="qtyInput" min="0.001" step="any" placeholder="Nhập SL chuẩn..." /></label>
-                  <label id="nccWrap" class="hidden">Nhà cung cấp <select id="txNcc"><option value="">-- Tùy chọn NCC --</option></select></label>
-                  <label id="docWrap">Số chứng từ / Mã phiếu (PO / Lệnh SX) <input id="docInput" placeholder="VD: PXK-2210, PO-01..." /></label>
-                  <label id="priceWrap" class="hidden">Đơn giá nhập (VNĐ) <input id="priceInput" type="number" min="0" step="any" placeholder="0" /></label>
+                  <label
+                    >Số lượng (ĐVT Chuẩn)
+                    <input
+                      type="number"
+                      id="qtyInput"
+                      min="0.001"
+                      step="any"
+                      placeholder="Nhập SL chuẩn..."
+                  /></label>
+                  <label id="nccWrap" class="hidden"
+                    >Nhà cung cấp
+                    <select id="txNcc">
+                      <option value="">-- Tùy chọn NCC --</option>
+                    </select></label
+                  >
+                  <label id="docWrap"
+                    >Số chứng từ / Mã phiếu (PO / Lệnh SX)
+                    <input id="docInput" placeholder="VD: PXK-2210, PO-01..."
+                  /></label>
+                  <label id="priceWrap" class="hidden"
+                    >Đơn giá nhập (VNĐ)
+                    <input
+                      id="priceInput"
+                      type="number"
+                      min="0"
+                      step="any"
+                      placeholder="0"
+                  /></label>
                 </div>
 
-                <label>Ghi chú giao dịch <input id="noteInput" placeholder="Ghi chú ca làm việc, chuyền, người nhận..." /></label>
+                <label
+                  >Ghi chú giao dịch
+                  <input
+                    id="noteInput"
+                    placeholder="Ghi chú ca làm việc, chuyền, người nhận..."
+                /></label>
                 <br />
-                <button id="addToCartBtn" class="w-100" style="font-size: 15px; padding: 12px">+ Đưa vào Phiếu tạm</button>
+                <button
+                  id="addToCartBtn"
+                  class="w-100"
+                  style="font-size: 15px; padding: 12px"
+                >
+                  + Đưa vào Phiếu tạm
+                </button>
               </div>
 
               <div class="card">
                 <div class="flex-between" style="margin-bottom: 12px">
                   <div>
-                    <h2 style="margin-bottom: 4px">Danh sách NVL trong Phiếu tạm</h2>
-                    <small class="text-muted">Kiểm tra kỹ trước khi Lưu hoặc In phiếu.</small>
+                    <h2 style="margin-bottom: 4px">
+                      Danh sách NVL trong Phiếu tạm
+                    </h2>
+                    <small class="text-muted"
+                      >Kiểm tra kỹ trước khi Lưu hoặc In phiếu.</small
+                    >
                   </div>
                   <div style="display: flex; gap: 8px; flex-wrap: wrap">
-                    <button id="printCartBtn" type="button" class="secondary">🖨️ Xem / Xuất PDF Phiếu tạm</button>
-                    <button id="submitTxBtn" type="button" class="success">💾 Lưu Phiếu Chính Thức</button>
+                    <button id="printCartBtn" type="button" class="secondary">
+                      🖨️ Xem / Xuất PDF Phiếu tạm
+                    </button>
+                    <button id="submitTxBtn" type="button" class="success">
+                      💾 Lưu Phiếu Chính Thức
+                    </button>
                   </div>
                 </div>
                 <div class="table-responsive">
                   <table id="cartTable">
-                    <thead><tr><th>NVL</th><th>Quy đổi / Số Kg</th><th>Loại GD</th><th>Mã SP / NCC</th><th>SL Chính</th><th>Ghi chú</th><th></th></tr></thead>
+                    <thead>
+                      <tr>
+                        <th>NVL</th>
+                        <th>Quy đổi / Số Kg</th>
+                        <th>Loại GD</th>
+                        <th>Mã SP / NCC</th>
+                        <th>SL Chính</th>
+                        <th>Ghi chú</th>
+                        <th></th>
+                      </tr>
+                    </thead>
                     <tbody></tbody>
                   </table>
                 </div>
@@ -229,25 +475,55 @@
               <div class="card">
                 <div class="flex-between" style="margin-bottom: 14px">
                   <div>
-                    <h2 style="margin-bottom: 4px">Sổ cái Lịch sử Giao dịch & Xuất PDF theo ngày</h2>
-                    <small class="text-muted">Chọn ngày (Từ ngày = Đến ngày) và loại giao dịch để in hoặc lưu file PDF tổng hợp cuối ngày.</small>
+                    <h2 style="margin-bottom: 4px">
+                      Sổ cái Lịch sử Giao dịch & Xuất PDF theo ngày
+                    </h2>
+                    <small class="text-muted"
+                      >Chọn ngày (Từ ngày = Đến ngày) và loại giao dịch để in
+                      hoặc lưu file PDF tổng hợp cuối ngày.</small
+                    >
                   </div>
                   <div style="display: flex; gap: 8px; flex-wrap: wrap">
-                    <button id="printHistoryBtn" type="button" style="background: #0f766e">🖨️ In / Lưu PDF Phiếu Tổng Hợp (Theo bộ lọc)</button>
+                    <button
+                      id="printHistoryBtn"
+                      type="button"
+                      style="background: #0f766e"
+                    >
+                      🖨️ In / Lưu PDF Phiếu Tổng Hợp (Theo bộ lọc)
+                    </button>
                   </div>
                 </div>
 
                 <div class="filter-row">
                   <label>Từ ngày<input type="date" id="historyFrom" /></label>
                   <label>Đến ngày<input type="date" id="historyTo" /></label>
-                  <label>Loại giao dịch <select id="historyType"><option value="">Tất cả loại</option></select></label>
-                  <label>Tìm NVL / Mã SP / Số CT <input id="historyQ" placeholder="Mã NVL, Tên, SP001..." /></label>
+                  <label
+                    >Loại giao dịch
+                    <select id="historyType">
+                      <option value="">Tất cả loại</option>
+                    </select></label
+                  >
+                  <label
+                    >Tìm NVL / Mã SP / Số CT
+                    <input id="historyQ" placeholder="Mã NVL, Tên, SP001..."
+                  /></label>
                   <button id="historyFilterBtn">🔍 Lọc dữ liệu</button>
                 </div>
 
                 <div class="table-responsive">
                   <table id="historyTable">
-                    <thead><tr><th>Thời gian</th><th>Người tạo</th><th>NVL</th><th>Loại GD</th><th>Mã SP / NCC</th><th>SL Thực Tế</th><th>Ghi chú / Chứng từ</th><th>In lẻ</th></tr></thead>
+                    <thead>
+                      <tr>
+                        <th>Thời gian</th>
+                        <th>Người tạo</th>
+                        <th>NVL</th>
+                        <th>Loại GD</th>
+                        <th>Mã SP / NCC</th>
+                        <th>SL Thực Tế</th>
+                        <th>Ghi chú / Chứng từ</th>
+                        <th>In lẻ</th>
+                      </tr>
+                    </thead>
                     <tbody></tbody>
                   </table>
                 </div>
@@ -261,16 +537,33 @@
               <div class="flex-between" style="margin-bottom: 14px">
                 <div>
                   <h2>Danh mục Tồn kho Nguyên Vật Liệu</h2>
-                  <p class="text-muted" style="margin: 0">Số liệu cập nhật tức thời ngay khi VP hoặc Xưởng lưu phiếu.</p>
+                  <p class="text-muted" style="margin: 0">
+                    Số liệu cập nhật tức thời ngay khi VP hoặc Xưởng lưu phiếu.
+                  </p>
                 </div>
                 <div class="inline-filters">
-                  <select id="inventoryCategory"><option value="">Tất cả nhóm</option></select>
-                  <input id="inventorySearch" placeholder="Tìm mã / tên / quy cách..." />
+                  <select id="inventoryCategory">
+                    <option value="">Tất cả nhóm</option>
+                  </select>
+                  <input
+                    id="inventorySearch"
+                    placeholder="Tìm mã / tên / quy cách..."
+                  />
                 </div>
               </div>
               <div class="table-responsive">
                 <table id="inventoryTable">
-                  <thead><tr><th>Mã NVL</th><th>Phân loại</th><th>Tên NVL</th><th>Quy cách chuẩn</th><th>ĐVT</th><th>Tồn kho hiện tại</th><th class="vp-only">Thao tác</th></tr></thead>
+                  <thead>
+                    <tr>
+                      <th>Mã NVL</th>
+                      <th>Phân loại</th>
+                      <th>Tên NVL</th>
+                      <th>Quy cách chuẩn</th>
+                      <th>ĐVT</th>
+                      <th>Tồn kho hiện tại</th>
+                      <th class="vp-only">Thao tác</th>
+                    </tr>
+                  </thead>
                   <tbody></tbody>
                 </table>
               </div>
@@ -279,24 +572,77 @@
             <div class="card vp-only">
               <h2>Thêm Nguyên Vật Liệu mới</h2>
               <div class="form-grid three-col">
-                <label>Phân loại (*) <input id="newCategory" list="categoryList" placeholder="Ví dụ: Kim Loại, Hóa Chất..." /></label>
-                <label>Tên NVL (*)<input id="newName" placeholder="Nhập tên vật tư..." /></label>
-                <label>Quy cách chuẩn<input id="newSpec" placeholder="VD: Ø20mm x 6m..." /></label>
+                <label
+                  >Phân loại (*)
+                  <input
+                    id="newCategory"
+                    list="categoryList"
+                    placeholder="Ví dụ: Kim Loại, Hóa Chất..."
+                /></label>
+                <label
+                  >Tên NVL (*)<input
+                    id="newName"
+                    placeholder="Nhập tên vật tư..."
+                /></label>
+                <label
+                  >Quy cách chuẩn<input
+                    id="newSpec"
+                    placeholder="VD: Ø20mm x 6m..."
+                /></label>
                 <label>
                   ĐVT Chuẩn (*)
                   <select id="newUnit">
-                    <option>Kg</option><option>Lít</option><option>Bó</option><option>Cái</option><option>Đôi</option>
-                    <option>Mét</option><option>Hộp</option><option>Thùng</option><option>Cuộn</option><option>Tấm</option><option>PCS</option>
+                    <option>Kg</option>
+                    <option>Lít</option>
+                    <option>Bó</option>
+                    <option>Cái</option>
+                    <option>Cây</option>
+                    <option>Mét</option>
+                    <option>Hộp</option>
+                    <option>Thùng</option>
+                    <option>Cuộn</option>
+                    <option>Tấm</option>
+                    <option>PCS</option>
                   </select>
                 </label>
-                <label>NCC Mặc định <select id="newSupplier"><option value="">-- Không chọn --</option></select></label>
-                <label>Ghi chú<input id="newNote" placeholder="Ghi chú bảo quản..." /></label>
-                <label>Hệ số quy đổi (Kg/mét) <small class="text-muted">- NVL dạng cây/thanh</small>
-                  <input type="number" id="newKgPerMet" min="0" step="any" placeholder="VD: 2.47 (để trống nếu không cắt khúc)" />
+                <label
+                  >NCC Mặc định
+                  <select id="newSupplier">
+                    <option value="">-- Không chọn --</option>
+                  </select></label
+                >
+                <label
+                  >Ghi chú<input id="newNote" placeholder="Ghi chú bảo quản..."
+                /></label>
+                <label
+                  >Hệ số quy đổi (Kg/mét)
+                  <small class="text-muted">- NVL dạng cây/thanh</small>
+                  <input
+                    type="number"
+                    id="newKgPerMet"
+                    min="0"
+                    step="any"
+                    placeholder="VD: 2.47 (để trống nếu không cắt khúc)"
+                  />
                 </label>
-                <label>Chiều dài chuẩn/cây (m) <input type="number" id="newChieuDaiChuan" min="0" step="any" placeholder="VD: 6" /></label>
-                <label>Mã gốc <small class="text-muted">- nếu đây là khúc dư của NVL khác</small>
-                  <input id="newMaGoc" placeholder="VD: NVL003 (để trống nếu là NVL gốc)" />
+                <label
+                  >Chiều dài chuẩn/cây (m)
+                  <input
+                    type="number"
+                    id="newChieuDaiChuan"
+                    min="0"
+                    step="any"
+                    placeholder="VD: 6"
+                /></label>
+                <label
+                  >Mã gốc
+                  <small class="text-muted"
+                    >- nếu đây là khúc dư của NVL khác</small
+                  >
+                  <input
+                    id="newMaGoc"
+                    placeholder="VD: NVL003 (để trống nếu là NVL gốc)"
+                  />
                 </label>
               </div>
               <datalist id="categoryList"></datalist>
@@ -310,47 +656,129 @@
               <div class="flex-between" style="margin-bottom: 14px">
                 <div>
                   <h2>Báo cáo Nhập - Xuất - Tồn & Biểu đồ Tiêu hao</h2>
-                  <p class="text-muted" style="margin: 0">Phân tích tỷ trọng NVL tiêu hao theo Mã hàng SX và kết xuất Excel / PDF.</p>
+                  <p class="text-muted" style="margin: 0">
+                    Phân tích tỷ trọng NVL tiêu hao theo Mã hàng SX và kết xuất
+                    Excel / PDF.
+                  </p>
                 </div>
               </div>
 
               <div class="report-filter-bar">
                 <label>Từ ngày<input type="date" id="reportFrom" /></label>
                 <label>Đến ngày<input type="date" id="reportTo" /></label>
-                <label>Loại giao dịch <select id="reportType"><option value="">Tất cả</option><option value="NHAP_KHO">Nhập kho</option><option value="XUAT_SAN_XUAT">Xuất Sản Xuất</option></select></label>
-                <label>Tìm NVL<input id="reportQ" placeholder="Mã hoặc Tên NVL..." /></label>
+                <label
+                  >Loại giao dịch
+                  <select id="reportType">
+                    <option value="">Tất cả</option>
+                    <option value="NHAP_KHO">Nhập kho</option>
+                    <option value="XUAT_SAN_XUAT">Xuất Sản Xuất</option>
+                  </select></label
+                >
+                <label
+                  >Tìm NVL<input id="reportQ" placeholder="Mã hoặc Tên NVL..."
+                /></label>
               </div>
 
-              <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap">
-                <button id="loadReportBtn" style="flex: 1; font-size: 15px">📊 Xem Báo Cáo & Cập Nhật Biểu Đồ</button>
-                <button id="printDailySummaryBtn" type="button" style="font-size: 15px; background-color: #0f766e">🖨️ In / Lưu PDF Phiếu Xuất Trong Kỳ</button>
-                <button id="exportExcelBtn" type="button" class="success" style="font-size: 15px; background-color: #107c41">📥 Xuất File Excel</button>
+              <div
+                style="
+                  margin-bottom: 20px;
+                  display: flex;
+                  gap: 10px;
+                  flex-wrap: wrap;
+                "
+              >
+                <button id="loadReportBtn" style="flex: 1; font-size: 15px">
+                  📊 Xem Báo Cáo & Cập Nhật Biểu Đồ
+                </button>
+                <button
+                  id="printDailySummaryBtn"
+                  type="button"
+                  style="font-size: 15px; background-color: #0f766e"
+                >
+                  🖨️ In / Lưu PDF Phiếu Xuất Trong Kỳ
+                </button>
+                <button
+                  id="exportExcelBtn"
+                  type="button"
+                  class="success"
+                  style="font-size: 15px; background-color: #107c41"
+                >
+                  📥 Xuất File Excel
+                </button>
               </div>
 
               <div class="charts-grid">
                 <div class="chart-card">
                   <div class="flex-between" style="margin-bottom: 10px">
-                    <div><h3 style="font-size: 16px">1. Tỷ trọng tiêu hao NVL theo Mã Hàng SX</h3><small class="text-muted">Xem mã hàng nào tiêu thụ nhiều NVL nhất hoặc chi tiết từng mã hàng</small></div>
-                    <select id="chartProductFilter" style="width: 210px; min-height: 36px; padding: 4px 8px"><option value="ALL">-- Tất cả Mã Hàng SX --</option></select>
+                    <div>
+                      <h3 style="font-size: 16px">
+                        1. Tỷ trọng tiêu hao NVL theo Mã Hàng SX
+                      </h3>
+                      <small class="text-muted"
+                        >Xem mã hàng nào tiêu thụ nhiều NVL nhất hoặc chi tiết
+                        từng mã hàng</small
+                      >
+                    </div>
+                    <select
+                      id="chartProductFilter"
+                      style="width: 210px; min-height: 36px; padding: 4px 8px"
+                    >
+                      <option value="ALL">-- Tất cả Mã Hàng SX --</option>
+                    </select>
                   </div>
-                  <div class="chart-canvas-wrap"><canvas id="productPieChart"></canvas></div>
-                  <div id="productChartEmpty" class="chart-empty hidden">Chưa có dữ liệu xuất sản xuất trong khoảng thời gian này.</div>
+                  <div class="chart-canvas-wrap">
+                    <canvas id="productPieChart"></canvas>
+                  </div>
+                  <div id="productChartEmpty" class="chart-empty hidden">
+                    Chưa có dữ liệu xuất sản xuất trong khoảng thời gian này.
+                  </div>
                 </div>
 
                 <div class="chart-card">
                   <div class="flex-between" style="margin-bottom: 10px">
-                    <div><h3 style="font-size: 16px">2. Cơ cấu xuất kho theo Nhóm Phân Loại NVL</h3><small class="text-muted">So sánh lượng xuất giữa các nhóm (Kim loại, Hóa chất, Bao bì...)</small></div>
+                    <div>
+                      <h3 style="font-size: 16px">
+                        2. Cơ cấu xuất kho theo Nhóm Phân Loại NVL
+                      </h3>
+                      <small class="text-muted"
+                        >So sánh lượng xuất giữa các nhóm (Kim loại, Hóa chất,
+                        Bao bì...)</small
+                      >
+                    </div>
                   </div>
-                  <div class="chart-canvas-wrap"><canvas id="categoryPieChart"></canvas></div>
-                  <div id="categoryChartEmpty" class="chart-empty hidden">Chưa có dữ liệu xuất sản xuất trong khoảng thời gian này.</div>
+                  <div class="chart-canvas-wrap">
+                    <canvas id="categoryPieChart"></canvas>
+                  </div>
+                  <div id="categoryChartEmpty" class="chart-empty hidden">
+                    Chưa có dữ liệu xuất sản xuất trong khoảng thời gian này.
+                  </div>
                 </div>
               </div>
 
               <div class="table-responsive" style="margin-top: 20px">
                 <table id="reportTable">
-                  <thead><tr><th>Mã NVL</th><th>Tên NVL (Nhấn để xem chi tiết)</th><th>Phân loại</th><th>ĐVT</th><th>Tổng Nhập</th><th>Tổng Cân Nhập (Kg)</th><th>Tổng Xuất SX</th><th>Tồn Kho Hiện Tại</th></tr></thead>
+                  <thead>
+                    <tr>
+                      <th>Mã NVL</th>
+                      <th>Tên NVL (Nhấn để xem chi tiết)</th>
+                      <th>Phân loại</th>
+                      <th>ĐVT</th>
+                      <th>Tổng Nhập</th>
+                      <th>Tổng Cân Nhập (Kg)</th>
+                      <th>Tổng Xuất SX</th>
+                      <th>Tồn Kho Hiện Tại</th>
+                    </tr>
+                  </thead>
                   <tbody></tbody>
-                  <tfoot><tr><th colspan="4">TỔNG CỘNG TOÀN KỲ</th><th id="footIn">0</th><th id="footWeight">-</th><th id="footProd">0</th><th>-</th></tr></tfoot>
+                  <tfoot>
+                    <tr>
+                      <th colspan="4">TỔNG CỘNG TOÀN KỲ</th>
+                      <th id="footIn">0</th>
+                      <th id="footWeight">-</th>
+                      <th id="footProd">0</th>
+                      <th>-</th>
+                    </tr>
+                  </tfoot>
                 </table>
               </div>
             </div>
@@ -360,34 +788,37 @@
           <section id="tab-sanpham" class="tab-content hidden vp-only">
             <div class="card">
               <div class="flex-between" style="margin-bottom: 14px">
-                <div><h2>Danh mục Mã Hàng Sản Xuất & Định Mức BOM</h2><p class="text-muted" style="margin: 0">Thiết lập định mức NVL cho từng mã sản phẩm để làm gợi ý tra cứu bên phần Xuất Sản Xuất.</p></div>
-                <div class="inline-filters"><input id="productSearch" placeholder="Tìm kiếm mã hoặc tên sản phẩm..." /></div>
+                <div>
+                  <h2>Danh mục Mã Hàng Sản Xuất & Định Mức BOM</h2>
+                  <p class="text-muted" style="margin: 0">
+                    Thiết lập định mức NVL cho từng mã sản phẩm để làm gợi ý tra
+                    cứu bên phần Xuất Sản Xuất.
+                  </p>
+                </div>
+                <div class="inline-filters">
+                  <input
+                    id="productSearch"
+                    placeholder="Tìm kiếm mã hoặc tên sản phẩm..."
+                  />
+                </div>
               </div>
               <div class="table-responsive">
                 <table id="productTable">
-                  <thead><tr><th>Mã SP</th><th>Tên sản phẩm</th><th>Quy cách / Tiêu chuẩn</th><th>ĐVT</th><th>Định mức BOM (Tham chiếu)</th><th>Tỷ lệ cắt (Cây thép)</th><th>Ghi chú</th><th class="vp-only">Thao tác</th></tr></thead>
+                  <thead>
+                    <tr>
+                      <th>Mã SP</th>
+                      <th>Tên sản phẩm</th>
+                      <th>Quy cách / Tiêu chuẩn</th>
+                      <th>ĐVT</th>
+                      <th>Định mức BOM (Tham chiếu)</th>
+                      <th>Tỷ lệ cắt (Cây thép)</th>
+                      <th>Ghi chú</th>
+                      <th class="vp-only">Thao tác</th>
+                    </tr>
+                  </thead>
                   <tbody></tbody>
                 </table>
               </div>
-            </div>
-
-            <div class="card">
-              <h2>Thêm mã hàng sản xuất mới</h2>
-              <div class="form-grid three-col">
-                <label>Mã sản phẩm <input id="newProductCode" placeholder="Để trống tự sinh mã (SP001...)" /></label>
-                <label>Tên sản phẩm (*)<input id="newProductName" placeholder="VD: Trục vít dẫn hướng Ø20..." /></label>
-                <label>Quy cách / Tiêu chuẩn<input id="newProductSpec" placeholder="VD: Dài 500mm, mạ crom..." /></label>
-                <label>
-                  Đơn vị tính
-                  <select id="newProductUnit">
-                    <option value="Cái">Cái</option><option value="Bộ">Bộ</option><option value="Cây">Cây</option><option value="Mét">Mét</option>
-                    <option value="Hộp">Hộp</option><option value="Thùng">Thùng</option><option value="Cuộn">Cuộn</option><option value="Tấm">Tấm</option>
-                    <option value="Kg">Kg</option><option value="PCS">PCS</option>
-                  </select>
-                </label>
-                <label style="grid-column: span 2">Ghi chú<input id="newProductNote" placeholder="Ghi chú kỹ thuật, mã bản vẽ..." /></label>
-              </div>
-              <button id="addProductBtn" class="success" style="margin-top: 15px">+ Thêm Mã Hàng SX</button>
             </div>
           </section>
 
@@ -395,12 +826,34 @@
           <section id="tab-ncc" class="tab-content hidden vp-only">
             <div class="card">
               <div class="flex-between" style="margin-bottom: 14px">
-                <div><h2>Danh sách Nhà Cung Cấp</h2><p class="text-muted" style="margin: 0">Quản lý đối tác cung ứng vật tư, hỗ trợ sửa và ẩn/xóa an toàn.</p></div>
-                <div class="inline-filters"><input id="supplierSearch" placeholder="Tìm kiếm NCC (Mã, tên, SĐT)..." /></div>
+                <div>
+                  <h2>Danh sách Nhà Cung Cấp</h2>
+                  <p class="text-muted" style="margin: 0">
+                    Quản lý đối tác cung ứng vật tư, hỗ trợ sửa và ẩn/xóa an
+                    toàn.
+                  </p>
+                </div>
+                <div class="inline-filters">
+                  <input
+                    id="supplierSearch"
+                    placeholder="Tìm kiếm NCC (Mã, tên, SĐT)..."
+                  />
+                </div>
               </div>
               <div class="table-responsive">
                 <table id="supplierTable">
-                  <thead><tr><th>Mã</th><th>Tên NCC</th><th>Địa chỉ</th><th>Điện thoại</th><th>Liên hệ</th><th>Email</th><th>Ghi chú</th><th class="vp-only">Thao tác</th></tr></thead>
+                  <thead>
+                    <tr>
+                      <th>Mã</th>
+                      <th>Tên NCC</th>
+                      <th>Địa chỉ</th>
+                      <th>Điện thoại</th>
+                      <th>Liên hệ</th>
+                      <th>Email</th>
+                      <th>Ghi chú</th>
+                      <th class="vp-only">Thao tác</th>
+                    </tr>
+                  </thead>
                   <tbody></tbody>
                 </table>
               </div>
@@ -408,14 +861,43 @@
             <div class="card">
               <h2>Thêm nhà cung cấp mới</h2>
               <div class="form-grid three-col">
-                <label>Tên NCC (*)<input id="supName" placeholder="Tên công ty / đơn vị..." /></label>
-                <label>Địa chỉ<input id="supAddress" placeholder="Địa chỉ trụ sở / kho..." /></label>
-                <label>SĐT<input id="supPhone" placeholder="Số điện thoại liên hệ..." /></label>
-                <label>Người liên hệ<input id="supContact" placeholder="Họ tên người phụ trách..." /></label>
-                <label>Email<input id="supEmail" type="email" placeholder="email@ncc.com..." /></label>
-                <label>Ghi chú<input id="supNote" placeholder="Ghi chú thêm..." /></label>
+                <label
+                  >Tên NCC (*)<input
+                    id="supName"
+                    placeholder="Tên công ty / đơn vị..."
+                /></label>
+                <label
+                  >Địa chỉ<input
+                    id="supAddress"
+                    placeholder="Địa chỉ trụ sở / kho..."
+                /></label>
+                <label
+                  >SĐT<input
+                    id="supPhone"
+                    placeholder="Số điện thoại liên hệ..."
+                /></label>
+                <label
+                  >Người liên hệ<input
+                    id="supContact"
+                    placeholder="Họ tên người phụ trách..."
+                /></label>
+                <label
+                  >Email<input
+                    id="supEmail"
+                    type="email"
+                    placeholder="email@ncc.com..."
+                /></label>
+                <label
+                  >Ghi chú<input id="supNote" placeholder="Ghi chú thêm..."
+                /></label>
               </div>
-              <button id="addSupplierBtn" class="success" style="margin-top: 15px">+ Thêm NCC</button>
+              <button
+                id="addSupplierBtn"
+                class="success"
+                style="margin-top: 15px"
+              >
+                + Thêm NCC
+              </button>
             </div>
           </section>
         </main>
@@ -424,28 +906,52 @@
       <!-- MODAL: SỬA NVL -->
       <div id="editItemModal" class="modal-overlay hidden no-print">
         <div class="modal-box">
-          <h2 style="margin-top: 0; color: var(--navy)">Sửa thông tin Nguyên Vật Liệu</h2>
+          <h2 style="margin-top: 0; color: var(--navy)">
+            Sửa thông tin Nguyên Vật Liệu
+          </h2>
           <input type="hidden" id="editItemCode" />
           <div class="form-grid two-col" style="margin-bottom: 15px">
-            <label>Phân loại <input id="editItemCat" list="categoryList" /></label>
+            <label
+              >Phân loại <input id="editItemCat" list="categoryList"
+            /></label>
             <label>Tên NVL <input id="editItemName" /></label>
             <label>Quy cách chuẩn <input id="editItemSpec" /></label>
             <label>
               ĐVT
               <select id="editItemUnit">
-                <option>Kg</option><option>Lít</option><option>Bó</option><option>Cái</option><option>Đôi</option>
-                <option>Mét</option><option>Hộp</option><option>Thùng</option><option>Cuộn</option><option>Tấm</option><option>PCS</option>
+                <option>Kg</option>
+                <option>Lít</option>
+                <option>Bó</option>
+                <option>Cái</option>
+                <option>Cây</option>
+                <option>Mét</option>
+                <option>Hộp</option>
+                <option>Thùng</option>
+                <option>Cuộn</option>
+                <option>Tấm</option>
+                <option>PCS</option>
               </select>
             </label>
           </div>
           <div class="form-grid two-col" style="margin-bottom: 15px">
-            <label>Hệ số quy đổi (Kg/mét) <input type="number" id="editKgPerMet" min="0" step="any" /></label>
-            <label>Chiều dài chuẩn/cây (m) <input type="number" id="editChieuDaiChuan" min="0" step="any" /></label>
-            <label style="grid-column: 1 / -1">Mã gốc (nếu là khúc dư của NVL khác) <input id="editMaGoc" placeholder="VD: NVL003" /></label>
+            <label
+              >Hệ số quy đổi (Kg/mét)
+              <input type="number" id="editKgPerMet" min="0" step="any"
+            /></label>
+            <label
+              >Chiều dài chuẩn/cây (m)
+              <input type="number" id="editChieuDaiChuan" min="0" step="any"
+            /></label>
+            <label style="grid-column: 1 / -1"
+              >Mã gốc (nếu là khúc dư của NVL khác)
+              <input id="editMaGoc" placeholder="VD: NVL003"
+            /></label>
           </div>
           <div style="display: flex; gap: 10px; justify-content: flex-end">
             <button class="danger" onclick="closeEditModal()">Hủy bỏ</button>
-            <button class="success" onclick="saveEditItem()">Lưu thay đổi</button>
+            <button class="success" onclick="saveEditItem()">
+              Lưu thay đổi
+            </button>
           </div>
         </div>
       </div>
@@ -453,20 +959,34 @@
       <!-- MODAL: SỬA NCC -->
       <div id="editSupplierModal" class="modal-overlay hidden no-print">
         <div class="modal-box">
-          <h2 style="margin-top: 0; color: var(--navy)">Sửa thông tin Nhà Cung Cấp</h2>
+          <h2 style="margin-top: 0; color: var(--navy)">
+            Sửa thông tin Nhà Cung Cấp
+          </h2>
           <input type="hidden" id="editSupCode" />
           <div class="form-grid two-col" style="margin-bottom: 15px">
-            <label>Mã NCC <input id="editSupCodeDisplay" disabled style="background: #eef2f6" /></label>
+            <label
+              >Mã NCC
+              <input
+                id="editSupCodeDisplay"
+                disabled
+                style="background: #eef2f6"
+            /></label>
             <label>Tên NCC (*) <input id="editSupName" /></label>
             <label>Địa chỉ <input id="editSupAddress" /></label>
             <label>Số điện thoại <input id="editSupPhone" /></label>
             <label>Người liên hệ <input id="editSupContact" /></label>
             <label>Email <input id="editSupEmail" type="email" /></label>
-            <label style="grid-column: 1 / -1">Ghi chú <input id="editSupNote" /></label>
+            <label style="grid-column: 1 / -1"
+              >Ghi chú <input id="editSupNote"
+            /></label>
           </div>
           <div style="display: flex; gap: 10px; justify-content: flex-end">
-            <button class="danger" onclick="closeEditSupplierModal()">Hủy bỏ</button>
-            <button class="success" onclick="saveEditSupplier()">Lưu thay đổi</button>
+            <button class="danger" onclick="closeEditSupplierModal()">
+              Hủy bỏ
+            </button>
+            <button class="success" onclick="saveEditSupplier()">
+              Lưu thay đổi
+            </button>
           </div>
         </div>
       </div>
@@ -474,25 +994,46 @@
       <!-- MODAL: SỬA MÃ HÀNG SX -->
       <div id="editProductModal" class="modal-overlay hidden no-print">
         <div class="modal-box">
-          <h2 style="margin-top: 0; color: var(--navy)">Sửa Mã Hàng Sản Xuất</h2>
+          <h2 style="margin-top: 0; color: var(--navy)">
+            Sửa Mã Hàng Sản Xuất
+          </h2>
           <input type="hidden" id="editProductCode" />
           <div class="form-grid two-col" style="margin-bottom: 15px">
-            <label>Mã sản phẩm <input id="editProductCodeDisplay" disabled style="background: #eef2f6" /></label>
+            <label
+              >Mã sản phẩm
+              <input
+                id="editProductCodeDisplay"
+                disabled
+                style="background: #eef2f6"
+            /></label>
             <label>Tên sản phẩm (*) <input id="editProductName" /></label>
             <label>Quy cách / Tiêu chuẩn <input id="editProductSpec" /></label>
             <label>
               Đơn vị tính
               <select id="editProductUnit">
-                <option value="Cái">Cái</option><option value="Bộ">Bộ</option><option value="Cây">Cây</option><option value="Mét">Mét</option>
-                <option value="Hộp">Hộp</option><option value="Thùng">Thùng</option><option value="Cuộn">Cuộn</option><option value="Tấm">Tấm</option>
-                <option value="Kg">Kg</option><option value="PCS">PCS</option>
+                <option value="Cái">Cái</option>
+                <option value="Bộ">Bộ</option>
+                <option value="Cây">Cây</option>
+                <option value="Mét">Mét</option>
+                <option value="Hộp">Hộp</option>
+                <option value="Thùng">Thùng</option>
+                <option value="Cuộn">Cuộn</option>
+                <option value="Tấm">Tấm</option>
+                <option value="Kg">Kg</option>
+                <option value="PCS">PCS</option>
               </select>
             </label>
-            <label style="grid-column: 1 / -1">Ghi chú <input id="editProductNote" /></label>
+            <label style="grid-column: 1 / -1"
+              >Ghi chú <input id="editProductNote"
+            /></label>
           </div>
           <div style="display: flex; gap: 10px; justify-content: flex-end">
-            <button class="danger" onclick="closeEditProductModal()">Hủy bỏ</button>
-            <button class="success" onclick="saveEditProduct()">Lưu thay đổi</button>
+            <button class="danger" onclick="closeEditProductModal()">
+              Hủy bỏ
+            </button>
+            <button class="success" onclick="saveEditProduct()">
+              Lưu thay đổi
+            </button>
           </div>
         </div>
       </div>
@@ -502,25 +1043,66 @@
         <div class="modal-box" style="max-width: 760px">
           <div class="flex-between" style="margin-bottom: 12px">
             <div>
-              <h2 style="margin: 0; color: var(--navy)" id="bomModalTitle">Thiết lập Định mức BOM</h2>
-              <small class="text-muted">Định mức này sẽ hiển thị ở phần Xuất Sản Xuất để gợi ý vật tư (không chặn xuất khi vượt mức).</small>
+              <h2 style="margin: 0; color: var(--navy)" id="bomModalTitle">
+                Thiết lập Định mức BOM
+              </h2>
+              <small class="text-muted"
+                >Định mức này sẽ hiển thị ở phần Xuất Sản Xuất để gợi ý vật tư
+                (không chặn xuất khi vượt mức).</small
+              >
             </div>
-            <button class="danger btn-sm" onclick="closeBomModal()">Đóng ✕</button>
+            <button class="danger btn-sm" onclick="closeBomModal()">
+              Đóng ✕
+            </button>
           </div>
           <input type="hidden" id="bomModalSp" />
-          <div style="background: #f1f5f9; padding: 14px; border-radius: 8px; margin-bottom: 16px">
+          <div
+            style="
+              background: #f1f5f9;
+              padding: 14px;
+              border-radius: 8px;
+              margin-bottom: 16px;
+            "
+          >
             <div class="form-grid three-col" style="margin-bottom: 10px">
-              <label style="grid-column: span 2">Chọn Nguyên Vật Liệu cần gắn vào BOM <select id="bomItemSelect"></select></label>
-              <label>Định mức / 1 ĐVT SP <input type="number" id="bomQtyInput" min="0" step="any" placeholder="VD: 1.25 (Để 0 nếu chỉ đánh dấu)" /></label>
+              <label style="grid-column: span 2"
+                >Chọn Nguyên Vật Liệu cần gắn vào BOM
+                <select id="bomItemSelect"></select
+              ></label>
+              <label
+                >Định mức / 1 ĐVT SP
+                <input
+                  type="number"
+                  id="bomQtyInput"
+                  min="0"
+                  step="any"
+                  placeholder="VD: 1.25 (Để 0 nếu chỉ đánh dấu)"
+              /></label>
             </div>
             <div style="display: flex; gap: 10px; align-items: end">
-              <label style="flex: 1">Ghi chú công đoạn / quy cách cắt <input id="bomNoteInput" placeholder="VD: Cắt phôi dài 510mm, hao hụt 2%..." /></label>
-              <button type="button" class="success" onclick="saveBomEntry()">+ Lưu vào BOM</button>
+              <label style="flex: 1"
+                >Ghi chú công đoạn / quy cách cắt
+                <input
+                  id="bomNoteInput"
+                  placeholder="VD: Cắt phôi dài 510mm, hao hụt 2%..."
+              /></label>
+              <button type="button" class="success" onclick="saveBomEntry()">
+                + Lưu vào BOM
+              </button>
             </div>
           </div>
           <div class="table-responsive" style="max-height: 320px">
             <table id="bomModalTable" style="min-width: 550px">
-              <thead><tr><th>Mã NVL</th><th>Tên NVL</th><th>ĐVT</th><th>Định mức / 1 SP</th><th>Ghi chú</th><th>Xóa</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Mã NVL</th>
+                  <th>Tên NVL</th>
+                  <th>ĐVT</th>
+                  <th>Định mức / 1 SP</th>
+                  <th>Ghi chú</th>
+                  <th>Xóa</th>
+                </tr>
+              </thead>
               <tbody></tbody>
             </table>
           </div>
@@ -532,25 +1114,71 @@
         <div class="modal-box" style="max-width: 760px">
           <div class="flex-between" style="margin-bottom: 12px">
             <div>
-              <h2 style="margin: 0; color: var(--navy)" id="cutRatioModalTitle">Thiết lập Tỷ lệ cắt</h2>
-              <small class="text-muted">Áp dụng cho NVL dạng cây/thanh (đã khai báo Hệ số Kg/mét) theo chiều dài chuẩn của mã NVL đó. Dùng để gợi ý Số cây cần xuất khi biết Số con cần sản xuất.</small>
+              <h2 style="margin: 0; color: var(--navy)" id="cutRatioModalTitle">
+                Thiết lập Tỷ lệ cắt
+              </h2>
+              <small class="text-muted"
+                >Áp dụng cho NVL dạng cây/thanh (đã khai báo Hệ số Kg/mét) theo
+                chiều dài chuẩn của mã NVL đó. Dùng để gợi ý Số cây cần xuất khi
+                biết Số con cần sản xuất.</small
+              >
             </div>
-            <button class="danger btn-sm" onclick="closeCutRatioModal()">Đóng ✕</button>
+            <button class="danger btn-sm" onclick="closeCutRatioModal()">
+              Đóng ✕
+            </button>
           </div>
           <input type="hidden" id="cutRatioModalSp" />
-          <div style="background: #f1f5f9; padding: 14px; border-radius: 8px; margin-bottom: 16px">
+          <div
+            style="
+              background: #f1f5f9;
+              padding: 14px;
+              border-radius: 8px;
+              margin-bottom: 16px;
+            "
+          >
             <div class="form-grid three-col" style="margin-bottom: 10px">
-              <label style="grid-column: span 2">Chọn NVL dạng cây/thanh <select id="cutRatioItemSelect"></select></label>
-              <label>Số con / 1 cây <input type="number" id="cutRatioQtyInput" min="0" step="any" placeholder="VD: 11" /></label>
+              <label style="grid-column: span 2"
+                >Chọn NVL dạng cây/thanh
+                <select id="cutRatioItemSelect"></select
+              ></label>
+              <label
+                >Số con / 1 cây
+                <input
+                  type="number"
+                  id="cutRatioQtyInput"
+                  min="0"
+                  step="any"
+                  placeholder="VD: 11"
+              /></label>
             </div>
             <div style="display: flex; gap: 10px; align-items: end">
-              <label style="flex: 1">Ghi chú <input id="cutRatioNoteInput" placeholder="VD: Trục dài 500mm, cắt từ cây 6m, đã trừ hao hụt..." /></label>
-              <button type="button" class="success" onclick="saveCutRatioEntry()">+ Lưu tỷ lệ cắt</button>
+              <label style="flex: 1"
+                >Ghi chú
+                <input
+                  id="cutRatioNoteInput"
+                  placeholder="VD: Trục dài 500mm, cắt từ cây 6m, đã trừ hao hụt..."
+              /></label>
+              <button
+                type="button"
+                class="success"
+                onclick="saveCutRatioEntry()"
+              >
+                + Lưu tỷ lệ cắt
+              </button>
             </div>
           </div>
           <div class="table-responsive" style="max-height: 320px">
             <table id="cutRatioModalTable" style="min-width: 550px">
-              <thead><tr><th>Mã NVL</th><th>Tên NVL</th><th>Chiều dài cây</th><th>Số con/cây</th><th>Ghi chú</th><th>Xóa</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Mã NVL</th>
+                  <th>Tên NVL</th>
+                  <th>Chiều dài cây</th>
+                  <th>Số con/cây</th>
+                  <th>Ghi chú</th>
+                  <th>Xóa</th>
+                </tr>
+              </thead>
               <tbody></tbody>
             </table>
           </div>
@@ -563,11 +1191,22 @@
           <div class="print-toolbar no-print">
             <div>
               <strong>📄 Xem trước Phiếu Kho (Chuẩn A4)</strong>
-              <span class="text-muted" style="font-size: 12px; margin-left: 8px">Mẹo: Trong hộp thoại In, chọn "Save as PDF" để lưu file theo từng ngày.</span>
+              <span class="text-muted" style="font-size: 12px; margin-left: 8px"
+                >Mẹo: Trong hộp thoại In, chọn "Save as PDF" để lưu file theo
+                từng ngày.</span
+              >
             </div>
             <div style="display: flex; gap: 8px">
-              <button type="button" class="success" onclick="triggerBrowserPrint()">🖨️ In Phiếu / Lưu thành PDF</button>
-              <button type="button" class="danger" onclick="closePrintModal()">Đóng</button>
+              <button
+                type="button"
+                class="success"
+                onclick="triggerBrowserPrint()"
+              >
+                🖨️ In Phiếu / Lưu thành PDF
+              </button>
+              <button type="button" class="danger" onclick="closePrintModal()">
+                Đóng
+              </button>
             </div>
           </div>
           <div id="printableArea" class="a4-sheet"></div>
@@ -584,120 +1223,349 @@
       <div id="admin-screen" class="screen hidden">
         <header class="navbar">
           <div class="nav-brand">Admin Sản Xuất</div>
-          <div class="nav-user">Xin chào, <span id="admin-name">Admin</span> | <a href="#" onclick="logout()">Thoát</a></div>
+          <div class="nav-user">
+            Xin chào, <span id="admin-name">Admin</span> |
+            <a href="#" onclick="logout()">Thoát</a>
+          </div>
         </header>
         <div class="app-body">
           <aside class="sidebar">
-            <button class="tab-btn active" onclick="switchTab('admin', 'tab-master')">Quản Lý Mã Hàng</button>
-            <button class="tab-btn" onclick="switchTab('admin', 'tab-po')">Quản Lý LOT</button>
-            <button class="tab-btn" onclick="switchTab('admin', 'tab-linemay')">Line & Máy</button>
-            <button class="tab-btn" onclick="switchTab('admin', 'tab-ng')">Xử Lý Hàng NG</button>
-            <button class="tab-btn" onclick="switchTab('admin', 'tab-matrix')">Theo dõi Tđ</button>
-            <button class="tab-btn" onclick="switchTab('admin', 'tab-history')">Lịch Sử SX</button>
+            <button
+              class="tab-btn active"
+              onclick="switchTab('admin', 'tab-master')"
+            >
+              Quản Lý Mã Hàng
+            </button>
+            <button class="tab-btn" onclick="switchTab('admin', 'tab-po')">
+              Quản Lý LOT
+            </button>
+            <button class="tab-btn" onclick="switchTab('admin', 'tab-linemay')">
+              Line & Máy
+            </button>
+            <button class="tab-btn" onclick="switchTab('admin', 'tab-ng')">
+              Xử Lý Hàng NG
+            </button>
+            <button class="tab-btn" onclick="switchTab('admin', 'tab-matrix')">
+              Theo dõi Tđ
+            </button>
+            <button class="tab-btn" onclick="switchTab('admin', 'tab-history')">
+              Lịch Sử SX
+            </button>
           </aside>
           <main class="content">
             <div id="tab-master" class="tab-content active">
-              <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start">
+              <div
+                style="
+                  display: flex;
+                  gap: 20px;
+                  flex-wrap: wrap;
+                  align-items: flex-start;
+                "
+              >
                 <div class="card form-card" style="flex: 1; min-width: 350px">
-                  <h2 style="margin-bottom: 20px; color: var(--navy)">Tạo Mã Hàng & Lộ Trình</h2>
+                  <h2 style="margin-bottom: 20px; color: var(--navy)">
+                    Tạo Mã Hàng & Lộ Trình
+                  </h2>
                   <form id="form-create-product">
                     <div class="input-group">
                       <label>Mã Sản Phẩm</label>
-                      <input type="text" id="md-product-code" placeholder="Để trống tự sinh (SP001...)" style="text-transform: uppercase" />
+                      <input
+                        type="text"
+                        id="md-product-code"
+                        placeholder="Để trống tự sinh (SP001...)"
+                        style="text-transform: uppercase"
+                      />
                     </div>
                     <div class="input-group">
                       <label>Tên Sản Phẩm</label>
-                      <input type="text" id="md-product-name" required placeholder="VD: Bánh răng thép" />
+                      <input
+                        type="text"
+                        id="md-product-name"
+                        required
+                        placeholder="VD: Bánh răng thép"
+                      />
                     </div>
                     <div class="input-group">
-                      <label>Lộ trình công đoạn <small style="font-weight: 400">(để trống nếu mã này chỉ dùng cho BOM kho, không qua công đoạn SX)</small></label>
-                      <div id="routing-builder" style="border: 1px dashed #cbd5e0; padding: 15px; border-radius: 4px; background: #f7fafc; min-height: 50px"></div>
-                      <button type="button" class="btn btn-secondary" onclick="addRoutingStep()" style="margin-top: 10px; font-size: 14px">+ Thêm công đoạn</button>
+                      <label
+                        >Lộ trình công đoạn
+                        <small style="font-weight: 400"
+                          >(để trống nếu mã này chỉ dùng cho BOM kho, không qua
+                          công đoạn SX)</small
+                        ></label
+                      >
+                      <div
+                        id="routing-builder"
+                        style="
+                          border: 1px dashed #cbd5e0;
+                          padding: 15px;
+                          border-radius: 4px;
+                          background: #f7fafc;
+                          min-height: 50px;
+                        "
+                      ></div>
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="addRoutingStep()"
+                        style="margin-top: 10px; font-size: 14px"
+                      >
+                        + Thêm công đoạn
+                      </button>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Lưu Mã Hàng</button>
+                    <button type="submit" class="btn btn-primary w-100">
+                      Lưu Mã Hàng
+                    </button>
                   </form>
                 </div>
                 <div class="card form-card" style="flex: 1.5; min-width: 400px">
-                  <h3 style="color: var(--navy); margin-bottom: 15px">Dữ Liệu Mã Hàng Đã Lưu</h3>
-                  <input type="text" id="search-master" class="search-input w-100" placeholder="🔍 Tìm Mã hàng hoặc Tên hàng..." onkeyup="filterMasterData()" style="margin-bottom: 15px" />
-                  <div id="master-list-container" style="max-height: 500px; overflow-y: auto"><p>Đang tải dữ liệu...</p></div>
+                  <h3 style="color: var(--navy); margin-bottom: 15px">
+                    Dữ Liệu Mã Hàng Đã Lưu
+                  </h3>
+                  <input
+                    type="text"
+                    id="search-master"
+                    class="search-input w-100"
+                    placeholder="🔍 Tìm Mã hàng hoặc Tên hàng..."
+                    onkeyup="filterMasterData()"
+                    style="margin-bottom: 15px"
+                  />
+                  <div
+                    id="master-list-container"
+                    style="max-height: 500px; overflow-y: auto"
+                  >
+                    <p>Đang tải dữ liệu...</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div id="tab-po" class="tab-content hidden">
-              <div class="card form-card" style="max-width: 600px; margin: 0 auto">
-                <h2 style="margin-bottom: 20px; color: var(--navy)">Tạo LOT và Đưa Sản Xuất</h2>
+              <div
+                class="card form-card"
+                style="max-width: 600px; margin: 0 auto"
+              >
+                <h2 style="margin-bottom: 20px; color: var(--navy)">
+                  Tạo LOT và Đưa Sản Xuất
+                </h2>
                 <form id="form-create-po">
-                  <div class="input-group"><label>Số LOT (VD: PO1610)</label><input type="text" id="po-prefix" required placeholder="VD: PO1610" style="text-transform: uppercase" /></div>
+                  <div class="input-group">
+                    <label>Số LOT (VD: PO1610)</label
+                    ><input
+                      type="text"
+                      id="po-prefix"
+                      required
+                      placeholder="VD: PO1610"
+                      style="text-transform: uppercase"
+                    />
+                  </div>
                   <div class="input-group">
                     <label>Mã Hàng (Gõ để tìm kiếm)</label>
-                    <input type="text" id="product-code" required placeholder="Gõ mã hàng..." style="text-transform: uppercase" list="product-suggestions" autocomplete="off" />
+                    <input
+                      type="text"
+                      id="product-code"
+                      required
+                      placeholder="Gõ mã hàng..."
+                      style="text-transform: uppercase"
+                      list="product-suggestions"
+                      autocomplete="off"
+                    />
                     <datalist id="product-suggestions"></datalist>
                   </div>
                   <div class="input-group" style="display: flex; gap: 10px">
-                    <div style="flex: 1"><label>Tổng Sản Lượng</label><input type="number" id="po-total" required min="1" /></div>
-                    <div style="flex: 1"><label>SL 1 LOT (SL chia)</label><input type="number" id="po-split" required min="1" /></div>
+                    <div style="flex: 1">
+                      <label>Tổng Sản Lượng</label
+                      ><input type="number" id="po-total" required min="1" />
+                    </div>
+                    <div style="flex: 1">
+                      <label>SL 1 LOT (SL chia)</label
+                      ><input type="number" id="po-split" required min="1" />
+                    </div>
                   </div>
-                  <div class="input-group"><label>Ngày Cấp Phát</label><input type="date" id="po-date" required /></div>
-                  <button type="submit" class="btn btn-primary w-100">Chẻ LOT & Cấp Phát Sản Xuất</button>
+                  <div class="input-group">
+                    <label>Ngày Cấp Phát</label
+                    ><input type="date" id="po-date" required />
+                  </div>
+                  <button type="submit" class="btn btn-primary w-100">
+                    Chẻ LOT & Cấp Phát Sản Xuất
+                  </button>
                 </form>
               </div>
             </div>
 
             <!-- TAB QUẢN LÝ LINE & MÁY -->
             <div id="tab-linemay" class="tab-content hidden">
-              <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start">
+              <div
+                style="
+                  display: flex;
+                  gap: 20px;
+                  flex-wrap: wrap;
+                  align-items: flex-start;
+                "
+              >
                 <div class="card form-card" style="flex: 1; min-width: 300px">
-                  <h3 style="color: var(--navy); margin-bottom: 15px">+ Thêm Line mới</h3>
+                  <h3 style="color: var(--navy); margin-bottom: 15px">
+                    + Thêm Line mới
+                  </h3>
                   <form id="form-create-line">
-                    <div class="input-group"><label>Mã Line</label><input type="text" id="new-line-id" required style="text-transform: uppercase" /></div>
-                    <div class="input-group"><label>Tên Line</label><input type="text" id="new-line-name" required /></div>
-                    <button type="submit" class="btn btn-primary w-100">Lưu Line</button>
+                    <div class="input-group">
+                      <label>Mã Line</label
+                      ><input
+                        type="text"
+                        id="new-line-id"
+                        required
+                        style="text-transform: uppercase"
+                      />
+                    </div>
+                    <div class="input-group">
+                      <label>Tên Line</label
+                      ><input type="text" id="new-line-name" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                      Lưu Line
+                    </button>
                   </form>
                 </div>
                 <div class="card form-card" style="flex: 1; min-width: 300px">
-                  <h3 style="color: var(--navy); margin-bottom: 15px">+ Thêm Công đoạn mới</h3>
+                  <h3 style="color: var(--navy); margin-bottom: 15px">
+                    + Thêm Công đoạn mới
+                  </h3>
                   <form id="form-create-stage">
-                    <div class="input-group"><label>Thuộc Line</label><select id="new-stage-line" required></select></div>
-                    <div class="input-group"><label>Mã Công đoạn</label><input type="text" id="new-stage-id" required style="text-transform: uppercase" /></div>
-                    <div class="input-group"><label>Tên Công đoạn</label><input type="text" id="new-stage-name" required /></div>
-                    <button type="submit" class="btn btn-primary w-100">Lưu Công đoạn</button>
+                    <div class="input-group">
+                      <label>Thuộc Line</label
+                      ><select id="new-stage-line" required></select>
+                    </div>
+                    <div class="input-group">
+                      <label>Mã Công đoạn</label
+                      ><input
+                        type="text"
+                        id="new-stage-id"
+                        required
+                        style="text-transform: uppercase"
+                      />
+                    </div>
+                    <div class="input-group">
+                      <label>Tên Công đoạn</label
+                      ><input type="text" id="new-stage-name" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                      Lưu Công đoạn
+                    </button>
                   </form>
                 </div>
                 <div class="card form-card" style="flex: 1; min-width: 300px">
-                  <h3 style="color: var(--navy); margin-bottom: 15px">+ Thêm Máy mới</h3>
+                  <h3 style="color: var(--navy); margin-bottom: 15px">
+                    + Thêm Máy mới
+                  </h3>
                   <form id="form-create-machine">
-                    <div class="input-group"><label>Thuộc Line</label><select id="new-machine-line" required></select></div>
-                    <div class="input-group"><label>Mã Máy</label><input type="text" id="new-machine-code" required style="text-transform: uppercase" /></div>
-                    <div class="input-group"><label>Tên Máy</label><input type="text" id="new-machine-name" /></div>
-                    <button type="submit" class="btn btn-primary w-100">Lưu Máy</button>
+                    <div class="input-group">
+                      <label>Thuộc Line</label
+                      ><select id="new-machine-line" required></select>
+                    </div>
+                    <div class="input-group">
+                      <label>Mã Máy</label
+                      ><input
+                        type="text"
+                        id="new-machine-code"
+                        required
+                        style="text-transform: uppercase"
+                      />
+                    </div>
+                    <div class="input-group">
+                      <label>Tên Máy</label
+                      ><input type="text" id="new-machine-name" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                      Lưu Máy
+                    </button>
                   </form>
                 </div>
               </div>
               <div class="card" style="margin-top: 16px">
-                <h3 style="color: var(--navy); margin-bottom: 15px">Danh sách Line / Công đoạn / Máy</h3>
-                <div id="linemay-list-container"><p>Đang tải dữ liệu...</p></div>
+                <h3 style="color: var(--navy); margin-bottom: 15px">
+                  Danh sách Line / Công đoạn / Máy
+                </h3>
+                <div id="linemay-list-container">
+                  <p>Đang tải dữ liệu...</p>
+                </div>
               </div>
             </div>
 
             <div id="tab-ng" class="tab-content hidden">
-              <div class="card form-card" style="max-width: 600px; margin: 0 auto">
-                <h2 style="margin-bottom: 20px; color: var(--maroon)">Xử Lý Hàng Lỗi (NG)</h2>
-                <p style="margin-bottom: 15px; font-size: 14px">Xem bảng TK để biết số LOT có NG</p>
+              <div
+                class="card form-card"
+                style="max-width: 680px; margin: 0 auto"
+              >
+                <h2 style="margin-bottom: 6px; color: var(--maroon)">
+                  Xử Lý & Phân Bổ Hàng Lỗi (NG)
+                </h2>
+                <p style="margin-bottom: 15px; font-size: 13px; color: #64748b">
+                  Chọn lô hàng đang có lỗi NG (hệ thống tự xác định công đoạn
+                  đang giữ NG). Bạn có thể chia nhỏ số lượng để vừa hủy (SCRAP)
+                  vừa chuyển về các công đoạn khác nhau (NC1, Nhiệt luyện...)
+                  làm lại.
+                </p>
                 <form id="form-resolve-ng">
-                  <div class="input-group"><label>1. Chọn LOT</label><select id="ng-po-select" required><option value="">-- Vui lòng chờ tải dữ liệu --</option></select></div>
-                  <div class="input-group"><label>Nơi có hàng NG</label><select id="ng-current-stage" required><option value="">-- Vui lòng chờ tải dữ liệu --</option></select></div>
-                  <div class="input-group"><label>Nhập SL</label><input type="number" id="ng-qty" required min="1" placeholder="Số lượng...." /></div>
                   <div class="input-group">
-                    <label>Xử LÝ</label>
-                    <select id="ng-action" required onchange="toggleReworkStage()">
-                      <option value="SCRAP">Báo Hủy (SCRAP)</option>
-                      <option value="REWORK">Làm lại (REWORK)-Đưa về LIne cũ</option>
+                    <label>1. Chọn LOT & Công đoạn đang có hàng NG</label>
+                    <select
+                      id="ng-po-select"
+                      required
+                      onchange="onNgLotSelectChange()"
+                    >
+                      <option value="">-- Vui lòng chờ tải dữ liệu --</option>
                     </select>
                   </div>
-                  <div class="input-group hidden" id="group-return-stage"><label>Trả về đâu ?</label><select id="ng-return-stage"><option value="">Chọn công đoạn</option></select></div>
-                  <button type="submit" class="btn btn-danger w-100">Xác Nhận</button>
+
+                  <div
+                    id="ng-split-container"
+                    class="hidden"
+                    style="margin-top: 12px"
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 8px;
+                      "
+                    >
+                      <strong style="color: var(--navy); font-size: 14px"
+                        >2. Chia phương án xử lý số lượng NG:</strong
+                      >
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="addNgSplitRow()"
+                        style="padding: 5px 10px; font-size: 12px"
+                      >
+                        + Thêm dòng chia xử lý
+                      </button>
+                    </div>
+                    <div id="ng-split-rows"></div>
+                    <div
+                      style="
+                        font-size: 13px;
+                        font-weight: bold;
+                        margin: 10px 0;
+                        padding: 8px;
+                        background: #fef2f2;
+                        border-radius: 6px;
+                        color: #991b1b;
+                      "
+                    >
+                      Tổng NG đang có: <span id="ng-max-qty">0</span> pcs | Đang
+                      chọn xử lý: <span id="ng-selected-total">0</span> pcs |
+                      Còn lại: <span id="ng-remain-qty">0</span> pcs
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    class="btn btn-danger w-100"
+                    style="margin-top: 10px"
+                  >
+                    Xác Nhận Xử Lý Hàng NG
+                  </button>
                 </form>
               </div>
             </div>
@@ -706,31 +1574,116 @@
               <h2>Bảng TK (WIP)</h2>
               <p>BẢNG TỔNG KẾT - THEO CÔNG ĐOẠN</p>
               <div class="toolbar">
-                <input type="text" id="search-date" class="search-input" placeholder="🔍 Tìm Ngày (VD: 04/10)" onkeyup="filterMatrix()" />
-                <input type="text" id="search-lot" class="search-input" placeholder="🔍 Tìm Số LOT" onkeyup="filterMatrix()" />
-                <input type="text" id="search-code" class="search-input" placeholder="🔍 Tìm Mã Hàng" onkeyup="filterMatrix()" />
-                <button class="btn btn-primary" onclick="fetchMatrixReport()">Làm mới</button>
-                <button class="btn btn-secondary" onclick="exportExcel()" style="background-color: var(--green)">Xuất Excel</button>
-                <button class="btn btn-secondary" onclick="window.print()">In Báo Cáo</button>
+                <input
+                  type="text"
+                  id="search-date"
+                  class="search-input"
+                  placeholder="🔍 Tìm Ngày (VD: 04/10)"
+                  onkeyup="filterMatrix()"
+                />
+                <input
+                  type="text"
+                  id="search-lot"
+                  class="search-input"
+                  placeholder="🔍 Tìm Số LOT"
+                  onkeyup="filterMatrix()"
+                />
+                <input
+                  type="text"
+                  id="search-code"
+                  class="search-input"
+                  placeholder="🔍 Tìm Mã Hàng"
+                  onkeyup="filterMatrix()"
+                />
+                <button class="btn btn-primary" onclick="fetchMatrixReport()">
+                  Làm mới
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  onclick="exportExcel()"
+                  style="background-color: var(--green)"
+                >
+                  Xuất Excel
+                </button>
+                <button class="btn btn-secondary" onclick="window.print()">
+                  In Báo Cáo
+                </button>
               </div>
-              <div id="matrix-table-container" style="overflow-x: auto"><p>Đang tải dữ liệu...</p></div>
+              <div id="matrix-table-container" style="overflow-x: auto">
+                <p>Đang tải dữ liệu...</p>
+              </div>
             </div>
 
             <div id="tab-history" class="tab-content hidden">
               <h2 style="margin-bottom: 10px">Lịch Sử Giao Dịch</h2>
-              <div class="toolbar" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px">
-                <input type="date" id="hist-date-from" class="search-input" title="Từ ngày" style="flex: 1; min-width: 120px" onchange="filterHistoryLog('admin')" />
-                <input type="date" id="hist-date-to" class="search-input" title="Đến ngày" style="flex: 1; min-width: 120px" onchange="filterHistoryLog('admin')" />
-                <select id="hist-stage" class="search-input" style="flex: 1.5; min-width: 150px" onchange="filterHistoryLog('admin')"><option value="">-- Mọi công đoạn --</option></select>
+              <div
+                class="toolbar"
+                style="
+                  display: flex;
+                  gap: 8px;
+                  flex-wrap: wrap;
+                  margin-bottom: 15px;
+                "
+              >
+                <input
+                  type="date"
+                  id="hist-date-from"
+                  class="search-input"
+                  title="Từ ngày"
+                  style="flex: 1; min-width: 120px"
+                  onchange="filterHistoryLog('admin')"
+                />
+                <input
+                  type="date"
+                  id="hist-date-to"
+                  class="search-input"
+                  title="Đến ngày"
+                  style="flex: 1; min-width: 120px"
+                  onchange="filterHistoryLog('admin')"
+                />
+                <select
+                  id="hist-stage"
+                  class="search-input"
+                  style="flex: 1.5; min-width: 150px"
+                  onchange="filterHistoryLog('admin')"
+                >
+                  <option value="">-- Mọi công đoạn --</option>
+                </select>
                 <div style="flex: 2; min-width: 200px">
-                  <input type="text" id="hist-keyword" list="hist-suggest" class="search-input w-100" placeholder="🔍 Gõ Mã Hàng / Số LOT..." oninput="filterHistoryLog('admin')" autocomplete="off" style="text-transform: uppercase" />
+                  <input
+                    type="text"
+                    id="hist-keyword"
+                    list="hist-suggest"
+                    class="search-input w-100"
+                    placeholder="🔍 Gõ Mã Hàng / Số LOT..."
+                    oninput="filterHistoryLog('admin')"
+                    autocomplete="off"
+                    style="text-transform: uppercase"
+                  />
                   <datalist id="hist-suggest"></datalist>
                 </div>
               </div>
               <div class="card" style="overflow-x: auto; max-height: 500px">
                 <table class="matrix-table">
-                  <thead><tr><th>Thời Gian</th><th>Người Thao Tác</th><th>Mã Hàng</th><th>Số PO/LOT</th><th>Loại</th><th>SL</th><th>Từ</th><th>Đến</th></tr></thead>
-                  <tbody id="history-tbody"><tr><td colspan="8" style="text-align: center">Đang tải dữ liệu...</td></tr></tbody>
+                  <thead>
+                    <tr>
+                      <th>Thời Gian</th>
+                      <th>Người Thao Tác</th>
+                      <th>Mã Hàng</th>
+                      <th>Số PO/LOT</th>
+                      <th>Loại</th>
+                      <th>SL</th>
+                      <th>Từ</th>
+                      <th>Đến</th>
+                    </tr>
+                  </thead>
+                  <tbody id="history-tbody">
+                    <tr>
+                      <td colspan="8" style="text-align: center">
+                        Đang tải dữ liệu...
+                      </td>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
             </div>
@@ -742,79 +1695,279 @@
       <div id="leader-screen" class="screen hidden">
         <header class="navbar mobile-nav">
           <div class="nav-brand">
-            Xin chào, <span id="leader-name" style="color: var(--lime); font-weight: bold">Leader</span>
-            <div style="font-size: 13px; font-weight: normal; margin-top: 4px">Line quản lý: <span id="leader-line">...</span></div>
+            Xin chào,
+            <span id="leader-name" style="color: var(--lime); font-weight: bold"
+              >Leader</span
+            >
+            <div style="font-size: 13px; font-weight: normal; margin-top: 4px">
+              Line quản lý: <span id="leader-line">...</span>
+            </div>
           </div>
-          <a href="#" class="logout-btn" onclick="logout()" style="color: var(--white); text-decoration: none; font-weight: bold">Thoát</a>
+          <a
+            href="#"
+            class="logout-btn"
+            onclick="logout()"
+            style="
+              color: var(--white);
+              text-decoration: none;
+              font-weight: bold;
+            "
+            >Thoát</a
+          >
         </header>
         <div class="tabs-mobile">
-          <button class="tab-btn-mobile active" onclick="switchTab('leader', 'tab-wip')">Số lượng tồn</button>
-          <button class="tab-btn-mobile" onclick="switchTab('leader', 'tab-action')">Thao Tác</button>
-          <button class="tab-btn-mobile" onclick="switchTab('leader', 'tab-history-leader')">Hàng đã giao</button>
+          <button
+            class="tab-btn-mobile active"
+            onclick="switchTab('leader', 'tab-wip')"
+          >
+            Số lượng tồn
+          </button>
+          <button
+            class="tab-btn-mobile"
+            onclick="switchTab('leader', 'tab-action')"
+          >
+            Thao Tác
+          </button>
+          <button
+            class="tab-btn-mobile"
+            onclick="switchTab('leader', 'tab-history-leader')"
+          >
+            Hàng đã giao
+          </button>
         </div>
-        <main class="content-mobile" style="display: flex; flex-direction: column">
+        <main
+          class="content-mobile"
+          style="display: flex; flex-direction: column"
+        >
           <div id="tab-wip" class="tab-content active" style="order: 2"></div>
 
-          <div id="leader-search-group" style="order: 1; display: flex; gap: 8px; margin-bottom: 15px; width: 100%">
+          <div
+            id="leader-search-group"
+            style="
+              order: 1;
+              display: flex;
+              gap: 8px;
+              margin-bottom: 15px;
+              width: 100%;
+            "
+          >
             <div style="flex: 1; min-width: 0">
-              <input type="text" id="search-leader-product" list="leader-product-list" oninput="updateLeaderLotOptions()" placeholder="🔍 MÃ HÀNG..."
-                style="width: 100%; padding: 8px 5px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; color: var(--navy); text-transform: uppercase; font-size: 13px; box-sizing: border-box" autocomplete="off" />
+              <input
+                type="text"
+                id="search-leader-product"
+                list="leader-product-list"
+                oninput="updateLeaderLotOptions()"
+                placeholder="🔍 MÃ HÀNG..."
+                style="
+                  width: 100%;
+                  padding: 8px 5px;
+                  border-radius: 4px;
+                  border: 1px solid #ccc;
+                  font-weight: bold;
+                  color: var(--navy);
+                  text-transform: uppercase;
+                  font-size: 13px;
+                  box-sizing: border-box;
+                "
+                autocomplete="off"
+              />
               <datalist id="leader-product-list"></datalist>
             </div>
             <div style="flex: 1; min-width: 0">
-              <input type="text" id="search-leader-lot" list="leader-lot-list" oninput="filterLeaderPOs()" placeholder="🔍 SỐ LOT..."
-                style="width: 100%; padding: 8px 5px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; color: var(--navy); text-transform: uppercase; font-size: 13px; box-sizing: border-box" autocomplete="off" />
+              <input
+                type="text"
+                id="search-leader-lot"
+                list="leader-lot-list"
+                oninput="filterLeaderPOs()"
+                placeholder="🔍 SỐ LOT..."
+                style="
+                  width: 100%;
+                  padding: 8px 5px;
+                  border-radius: 4px;
+                  border: 1px solid #ccc;
+                  font-weight: bold;
+                  color: var(--navy);
+                  text-transform: uppercase;
+                  font-size: 13px;
+                  box-sizing: border-box;
+                "
+                autocomplete="off"
+              />
               <datalist id="leader-lot-list"></datalist>
             </div>
           </div>
-          <style>#tab-wip.hidden + #leader-search-group { display: none !important; }</style>
+          <style>
+            #tab-wip.hidden + #leader-search-group {
+              display: none !important;
+            }
+          </style>
 
           <div id="tab-action" class="tab-content hidden" style="order: 3">
             <div class="card form-card">
               <h3 style="color: var(--navy); margin-bottom: 15px">Giao Nhận</h3>
-              <div class="input-group"><label>Ngày tháng</label><input type="date" id="action-date" required /></div>
-              <div class="input-group"><label>Chọn PO</label><select id="po-select" onchange="onPoSelectChange()"><option>-- Đang tải dữ liệu --</option></select></div>
-              <div class="input-group"><label>Số lượng giao (PASS)</label><input type="number" id="qty-pass" value="0" /></div>
-              <div class="input-group"><label class="text-error">Số lượng NG</label><input type="number" id="qty-ng" value="0" /></div>
-              <button class="btn btn-primary w-100" onclick="submitMove()">Xác Nhận</button>
+              <div class="input-group">
+                <label>Ngày tháng</label
+                ><input type="date" id="action-date" required />
+              </div>
+              <div class="input-group">
+                <label>Chọn PO</label
+                ><select id="po-select" onchange="onPoSelectChange()">
+                  <option>-- Đang tải dữ liệu --</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label>Số lượng giao (PASS)</label
+                ><input type="number" id="qty-pass" value="0" />
+              </div>
+              <div class="input-group">
+                <label class="text-error">Số lượng NG</label
+                ><input type="number" id="qty-ng" value="0" />
+              </div>
+              <button class="btn btn-primary w-100" onclick="submitMove()">
+                Xác Nhận
+              </button>
             </div>
 
             <!-- KHU PHÂN BỔ XUỐNG MÁY - chỉ hiện khi đã chọn 1 LOT -->
             <div id="allocation-card" class="card form-card hidden">
-              <h3 style="color: var(--navy); margin-bottom: 15px">Chia Xuống Máy</h3>
-              <small class="text-muted" style="display: block; margin-bottom: 10px">Phân bổ số lượng LOT đang chọn xuống từng máy cụ thể, kèm ngày nhập/ngày giao - chỉ để theo dõi, không ảnh hưởng số liệu PASS/NG ở trên.</small>
+              <h3 style="color: var(--navy); margin-bottom: 15px">
+                Chia Xuống Máy
+              </h3>
+              <small
+                class="text-muted"
+                style="display: block; margin-bottom: 10px"
+                >Phân bổ số lượng LOT đang chọn xuống từng máy cụ thể, kèm ngày
+                nhập/ngày giao. Phải phân bổ máy trước - chỉ số lượng đang chạy
+                trên máy mới được giao PASS/NG ở trên.</small
+              >
               <div id="allocation-rows"></div>
-              <button type="button" class="btn btn-secondary" onclick="addAllocationRow()" style="margin-bottom: 10px; font-size: 13px">+ Thêm dòng máy</button>
-              <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px">Đã phân bổ: <span id="allocation-total">0</span> / Còn lại: <span id="allocation-remaining">0</span></div>
-              <button class="btn btn-primary w-100" onclick="submitMachineAllocations()">Lưu Phân Bổ</button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="addAllocationRow()"
+                style="margin-bottom: 10px; font-size: 13px"
+              >
+                + Thêm dòng máy
+              </button>
+              <div
+                style="font-size: 13px; font-weight: 600; margin-bottom: 10px"
+              >
+                Đã phân bổ: <span id="allocation-total">0</span> / Còn lại:
+                <span id="allocation-remaining">0</span>
+              </div>
+              <button
+                class="btn btn-primary w-100"
+                onclick="submitMachineAllocations()"
+              >
+                Lưu Phân Bổ
+              </button>
 
-              <h4 style="margin: 16px 0 8px; color: var(--navy); font-size: 14px">Đang phân bổ tại các máy</h4>
+              <h4
+                style="margin: 16px 0 8px; color: var(--navy); font-size: 14px"
+              >
+                Đang phân bổ tại các máy
+              </h4>
               <div class="table-responsive">
                 <table class="matrix-table" style="min-width: 420px">
-                  <thead><tr><th>Máy</th><th>Công đoạn</th><th>SL</th><th>Ngày nhập</th><th>Ngày giao</th></tr></thead>
-                  <tbody id="allocation-list-tbody"><tr><td colspan="5" style="text-align: center">Chưa có dữ liệu</td></tr></tbody>
+                  <thead>
+                    <tr>
+                      <th>Máy</th>
+                      <th>Công đoạn</th>
+                      <th>SL</th>
+                      <th>Ngày nhập</th>
+                      <th>Ngày giao</th>
+                    </tr>
+                  </thead>
+                  <tbody id="allocation-list-tbody">
+                    <tr>
+                      <td colspan="5" style="text-align: center">
+                        Chưa có dữ liệu
+                      </td>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
             </div>
           </div>
 
-          <div id="tab-history-leader" class="tab-content hidden" style="order: 4">
-            <h3 style="color: var(--navy); margin-bottom: 15px">Lịch Sử Giao Dịch</h3>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px">
-              <input type="date" id="hist-date-from-ld" class="search-input" title="Từ ngày" style="flex: 1; padding: 8px" onchange="filterHistoryLog('leader')" />
-              <input type="date" id="hist-date-to-ld" class="search-input" title="Đến ngày" style="flex: 1; padding: 8px" onchange="filterHistoryLog('leader')" />
+          <div
+            id="tab-history-leader"
+            class="tab-content hidden"
+            style="order: 4"
+          >
+            <h3 style="color: var(--navy); margin-bottom: 15px">
+              Lịch Sử Giao Dịch
+            </h3>
+            <div
+              style="
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                margin-bottom: 10px;
+              "
+            >
+              <input
+                type="date"
+                id="hist-date-from-ld"
+                class="search-input"
+                title="Từ ngày"
+                style="flex: 1; padding: 8px"
+                onchange="filterHistoryLog('leader')"
+              />
+              <input
+                type="date"
+                id="hist-date-to-ld"
+                class="search-input"
+                title="Đến ngày"
+                style="flex: 1; padding: 8px"
+                onchange="filterHistoryLog('leader')"
+              />
             </div>
             <div style="display: flex; gap: 8px; margin-bottom: 15px">
-              <select id="hist-stage-ld" class="search-input" style="flex: 1; padding: 8px" onchange="filterHistoryLog('leader')"><option value="">-- Mọi trạm --</option></select>
+              <select
+                id="hist-stage-ld"
+                class="search-input"
+                style="flex: 1; padding: 8px"
+                onchange="filterHistoryLog('leader')"
+              >
+                <option value="">-- Mọi trạm --</option>
+              </select>
               <div style="flex: 1.5; min-width: 0">
-                <input type="text" id="hist-keyword-ld" list="hist-suggest-ld" class="search-input" placeholder="🔍 Gõ Mã / LOT..." oninput="filterHistoryLog('leader')" autocomplete="off" style="width: 100%; padding: 8px; text-transform: uppercase" />
+                <input
+                  type="text"
+                  id="hist-keyword-ld"
+                  list="hist-suggest-ld"
+                  class="search-input"
+                  placeholder="🔍 Gõ Mã / LOT..."
+                  oninput="filterHistoryLog('leader')"
+                  autocomplete="off"
+                  style="width: 100%; padding: 8px; text-transform: uppercase"
+                />
                 <datalist id="hist-suggest-ld"></datalist>
               </div>
             </div>
-            <div class="card" style="overflow-x: auto; max-height: 500px; padding: 0">
+            <div
+              class="card"
+              style="overflow-x: auto; max-height: 500px; padding: 0"
+            >
               <table class="matrix-table" style="min-width: 600px">
-                <thead><tr><th>Thời Gian</th><th>Người Thao Tác</th><th>Mã Hàng</th><th>Số LOT</th><th>Loại</th><th>SL</th><th>Từ</th><th>Đến</th></tr></thead>
-                <tbody id="history-tbody-leader"><tr><td colspan="8" style="text-align: center">Đang tải...</td></tr></tbody>
+                <thead>
+                  <tr>
+                    <th>Thời Gian</th>
+                    <th>Người Thao Tác</th>
+                    <th>Mã Hàng</th>
+                    <th>Số LOT</th>
+                    <th>Loại</th>
+                    <th>SL</th>
+                    <th>Từ</th>
+                    <th>Đến</th>
+                  </tr>
+                </thead>
+                <tbody id="history-tbody-leader">
+                  <tr>
+                    <td colspan="8" style="text-align: center">Đang tải...</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -823,8 +1976,25 @@
     </div>
 
     <div id="toast" class="toast hidden no-print"></div>
-    <div id="mock-banner" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; z-index: 10001; background: #7c3aed; color: #fff; text-align: center; padding: 6px; font-size: 13px; font-weight: 600">
-      🧪 ĐANG DÙNG DỮ LIỆU MOCK (giả lập) — mọi thao tác không ghi vào backend thật. Bỏ <code>?mock=1</code> trên URL để tắt.
+    <div
+      id="mock-banner"
+      class="hidden"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10001;
+        background: #7c3aed;
+        color: #fff;
+        text-align: center;
+        padding: 6px;
+        font-size: 13px;
+        font-weight: 600;
+      "
+    >
+      🧪 ĐANG DÙNG DỮ LIỆU MOCK (giả lập) — mọi thao tác không ghi vào backend
+      thật. Bỏ <code>?mock=1</code> trên URL để tắt.
     </div>
 
     <!-- ============================================================

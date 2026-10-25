@@ -1,7 +1,15 @@
 // ============================================================
 // KHO NVL - NHÀ CUNG CẤP, MÃ HÀNG SX & ĐỊNH MỨC BOM (js/kho/partners.js)
 // ============================================================
-import { state, el, fmt, escapeHtml, showToast, api, applyRoleUI } from "../state.js";
+import {
+  state,
+  el,
+  fmt,
+  escapeHtml,
+  showToast,
+  api,
+  applyRoleUI,
+} from "../state.js";
 
 // ---------------- NHÀ CUNG CẤP ----------------
 export function renderSuppliers() {
@@ -15,14 +23,25 @@ export function renderSuppliers() {
   for (let i = 0; i < state.supplierData.length; i++) {
     const n = state.supplierData[i];
     if (q) {
-      const searchStr = ((n.ma_ncc || "") + " " + (n.ten_ncc || "") + " " + (n.so_dt || "") + " " + (n.nguoi_lien_he || "") + " " + (n.dia_chi || "")).toLowerCase();
+      const searchStr = (
+        (n.ma_ncc || "") +
+        " " +
+        (n.ten_ncc || "") +
+        " " +
+        (n.so_dt || "") +
+        " " +
+        (n.nguoi_lien_he || "") +
+        " " +
+        (n.dia_chi || "")
+      ).toLowerCase();
       if (searchStr.indexOf(q) === -1) continue;
     }
     rows.push(n);
   }
 
   if (rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Không tìm thấy nhà cung cấp nào.</td></tr>';
+    tbody.innerHTML =
+      '<tr><td colspan="8" class="text-center text-muted">Không tìm thấy nhà cung cấp nào.</td></tr>';
     return;
   }
 
@@ -35,14 +54,30 @@ export function renderSuppliers() {
 
     html +=
       "<tr>" +
-      "<td><b>" + escapeHtml(n.ma_ncc) + "</b></td>" +
-      "<td><b>" + escapeHtml(n.ten_ncc) + "</b></td>" +
-      "<td>" + escapeHtml(n.dia_chi || "-") + "</td>" +
-      "<td>" + escapeHtml(n.so_dt || "-") + "</td>" +
-      "<td>" + escapeHtml(n.nguoi_lien_he || "-") + "</td>" +
-      "<td>" + escapeHtml(n.email || "-") + "</td>" +
-      "<td>" + escapeHtml(n.ghi_chu || "-") + "</td>" +
-      '<td class="vp-only">' + btnHtml + "</td>" +
+      "<td><b>" +
+      escapeHtml(n.ma_ncc) +
+      "</b></td>" +
+      "<td><b>" +
+      escapeHtml(n.ten_ncc) +
+      "</b></td>" +
+      "<td>" +
+      escapeHtml(n.dia_chi || "-") +
+      "</td>" +
+      "<td>" +
+      escapeHtml(n.so_dt || "-") +
+      "</td>" +
+      "<td>" +
+      escapeHtml(n.nguoi_lien_he || "-") +
+      "</td>" +
+      "<td>" +
+      escapeHtml(n.email || "-") +
+      "</td>" +
+      "<td>" +
+      escapeHtml(n.ghi_chu || "-") +
+      "</td>" +
+      '<td class="vp-only">' +
+      btnHtml +
+      "</td>" +
       "</tr>";
   }
   tbody.innerHTML = html;
@@ -52,12 +87,20 @@ export function renderSuppliers() {
 export async function addSupplier(reloadCallback) {
   try {
     const payload = {
-      ten_ncc: el("supName").value.trim(), dia_chi: el("supAddress").value.trim(), so_dt: el("supPhone").value.trim(),
-      nguoi_lien_he: el("supContact").value.trim(), email: el("supEmail").value.trim(), ghi_chu: el("supNote").value.trim(),
+      ten_ncc: el("supName").value.trim(),
+      dia_chi: el("supAddress").value.trim(),
+      so_dt: el("supPhone").value.trim(),
+      nguoi_lien_he: el("supContact").value.trim(),
+      email: el("supEmail").value.trim(),
+      ghi_chu: el("supNote").value.trim(),
     };
-    if (!payload.ten_ncc) return showToast("Tên nhà cung cấp không được để trống.", true);
+    if (!payload.ten_ncc)
+      return showToast("Tên nhà cung cấp không được để trống.", true);
 
-    await api("/api/kho/suppliers", { method: "POST", body: JSON.stringify(payload) });
+    await api("/api/kho/suppliers", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
     showToast("Đã thêm NCC thành công.");
 
     el("supName").value = "";
@@ -75,6 +118,12 @@ export async function addSupplier(reloadCallback) {
 
 // ---------------- MÃ HÀNG SẢN XUẤT & ĐỊNH MỨC BOM ----------------
 export function renderProducts() {
+  // Tự động ẩn khung "Thêm mã hàng sản xuất mới" bên Kho nếu vẫn còn trong HTML
+  const addProdBtn = el("addProductBtn");
+  if (addProdBtn && addProdBtn.closest(".card")) {
+    addProdBtn.closest(".card").classList.add("hidden");
+  }
+
   const table = el("productTable");
   if (!table) return;
   const tbody = table.querySelector("tbody");
@@ -85,14 +134,23 @@ export function renderProducts() {
   for (let i = 0; i < state.productData.length; i++) {
     const p = state.productData[i];
     if (q) {
-      const searchStr = ((p.ma_sp || "") + " " + (p.ten_sp || "") + " " + (p.quy_cach || "") + " " + (p.ghi_chu || "")).toLowerCase();
+      const searchStr = (
+        (p.ma_sp || "") +
+        " " +
+        (p.ten_sp || "") +
+        " " +
+        (p.quy_cach || "") +
+        " " +
+        (p.ghi_chu || "")
+      ).toLowerCase();
       if (searchStr.indexOf(q) === -1) continue;
     }
     rows.push(p);
   }
 
   if (rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Không tìm thấy mã hàng sản xuất nào.</td></tr>';
+    tbody.innerHTML =
+      '<tr><td colspan="8" class="text-center text-muted">Chưa có mã hàng nào (Hãy tạo Mã Hàng bên phần Sản Xuất để tự động đồng bộ qua đây).</td></tr>';
     return;
   }
 
@@ -104,44 +162,84 @@ export function renderProducts() {
       return b.ma_sp === p.ma_sp;
     });
 
-    let bomSummaryHtml = '<span class="text-muted" style="font-size:12px;">Chưa gán BOM</span>';
+    let bomSummaryHtml =
+      '<span class="text-muted" style="font-size:12px;">Chưa gán BOM</span>';
     if (boms.length > 0) {
       const badges = boms.map(function (b) {
-        return '<span class="bom-badge">' + escapeHtml(b.ten_hang) + ": <b>" + (Number(b.dinh_muc) > 0 ? fmt(b.dinh_muc) : "Tùy chọn") + " " + escapeHtml(b.don_vi_tinh) + "</b></span>";
+        return (
+          '<span class="bom-badge">' +
+          escapeHtml(b.ten_hang) +
+          ": <b>" +
+          (Number(b.dinh_muc) > 0 ? fmt(b.dinh_muc) : "Tùy chọn") +
+          " " +
+          escapeHtml(b.don_vi_tinh) +
+          "</b></span>"
+        );
       });
       bomSummaryHtml = badges.join(" ");
     }
 
-    const routingBadge = p.routing_map ? '<br><span class="bom-badge" style="background:#e0f2fe; color:#0369a1;">Có lộ trình SX</span>' : "";
+    const routingBadge = p.routing_map
+      ? '<br><span class="bom-badge" style="background:#e0f2fe; color:#0369a1;">Có lộ trình SX</span>'
+      : "";
 
     const cutRatios = state.cutRatios.filter(function (r) {
       return r.ma_sp === p.ma_sp;
     });
-    let cutRatioSummaryHtml = '<span class="text-muted" style="font-size:12px;">Chưa khai báo</span>';
+    let cutRatioSummaryHtml =
+      '<span class="text-muted" style="font-size:12px;">Chưa khai báo</span>';
     if (cutRatios.length > 0) {
       cutRatioSummaryHtml = cutRatios
         .map(function (r) {
-          return '<span class="bom-badge">' + escapeHtml(r.ten_hang) + ": <b>" + fmt(r.so_con_moi_cay) + " con/cây</b></span>";
+          const lenStr =
+            Number(r.chieu_dai_chuan_m) > 0
+              ? " (cây " + fmt(r.chieu_dai_chuan_m) + "m)"
+              : "";
+          return (
+            '<span class="bom-badge">' +
+            escapeHtml(r.ten_hang) +
+            lenStr +
+            ": <b>" +
+            fmt(r.so_con_moi_cay) +
+            " pcs/cây</b></span>"
+          );
         })
         .join(" ");
     }
 
+    // Bên Kho NVL chỉ thiết lập Định mức BOM và Tỷ lệ cắt (quản lý mã SP nằm ở bên Sản Xuất)
     const btnHtml =
       `<button class="btn-sm" style="background:#0f766e; color:#fff;" onclick="openBomModal('${escapeHtml(p.ma_sp)}')">⚙️ Định mức BOM (${boms.length})</button>` +
-      `<button class="btn-sm" style="background:#7c3aed; color:#fff; margin-left:4px;" onclick="openCutRatioModal('${escapeHtml(p.ma_sp)}')">✂️ Tỷ lệ cắt (${cutRatios.length})</button>` +
-      `<button class="btn-sm" style="background:#0284c7; color:#fff; margin-left:4px;" onclick="openEditProductModal('${escapeHtml(p.ma_sp)}')">Sửa</button>` +
-      `<button class="btn-sm danger" style="margin-left:4px;" onclick="deleteProduct('${escapeHtml(p.ma_sp)}')">Xóa</button>`;
+      `<button class="btn-sm" style="background:#7c3aed; color:#fff; margin-left:6px;" onclick="openCutRatioModal('${escapeHtml(p.ma_sp)}')">✂️ Tỷ lệ cắt (${cutRatios.length})</button>`;
 
     html +=
       "<tr>" +
-      "<td><b>" + escapeHtml(p.ma_sp) + "</b>" + routingBadge + "</td>" +
-      "<td><b>" + escapeHtml(p.ten_sp) + "</b></td>" +
-      "<td>" + escapeHtml(p.quy_cach || "-") + "</td>" +
-      "<td>" + escapeHtml(p.don_vi_tinh || "Cái") + "</td>" +
-      "<td>" + bomSummaryHtml + "</td>" +
-      "<td>" + cutRatioSummaryHtml + "</td>" +
-      "<td>" + escapeHtml(p.ghi_chu || "-") + "</td>" +
-      '<td class="vp-only" style="white-space:nowrap;">' + btnHtml + "</td>" +
+      "<td><b>" +
+      escapeHtml(p.ma_sp) +
+      "</b>" +
+      routingBadge +
+      "</td>" +
+      "<td><b>" +
+      escapeHtml(p.ten_sp) +
+      "</b></td>" +
+      "<td>" +
+      escapeHtml(p.quy_cach || "-") +
+      "</td>" +
+      "<td>" +
+      escapeHtml(p.don_vi_tinh || "Cái") +
+      "</td>" +
+      "<td>" +
+      bomSummaryHtml +
+      "</td>" +
+      "<td>" +
+      cutRatioSummaryHtml +
+      "</td>" +
+      "<td>" +
+      escapeHtml(p.ghi_chu || "-") +
+      "</td>" +
+      '<td class="vp-only" style="white-space:nowrap;">' +
+      btnHtml +
+      "</td>" +
       "</tr>";
   }
   tbody.innerHTML = html;
@@ -151,13 +249,23 @@ export function renderProducts() {
 export async function addProduct(reloadCallback) {
   try {
     const payload = {
-      ma_sp: el("newProductCode").value.trim(), ten_sp: el("newProductName").value.trim(),
-      quy_cach: el("newProductSpec").value.trim(), don_vi_tinh: el("newProductUnit").value, ghi_chu: el("newProductNote").value.trim(),
+      ma_sp: el("newProductCode").value.trim(),
+      ten_sp: el("newProductName").value.trim(),
+      quy_cach: el("newProductSpec").value.trim(),
+      don_vi_tinh: el("newProductUnit").value,
+      ghi_chu: el("newProductNote").value.trim(),
     };
     if (!payload.ten_sp) return showToast("Vui lòng nhập tên sản phẩm.", true);
 
-    const res = await api("/api/products", { method: "POST", body: JSON.stringify(payload) });
-    showToast("Đã thêm mã hàng sản xuất [" + (res.ma_sp || payload.ma_sp) + "] thành công.");
+    const res = await api("/api/products", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    showToast(
+      "Đã thêm mã hàng sản xuất [" +
+        (res.ma_sp || payload.ma_sp) +
+        "] thành công.",
+    );
 
     el("newProductCode").value = "";
     el("newProductName").value = "";
@@ -177,7 +285,8 @@ function renderBomModalList(maSp) {
   });
 
   if (rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa có NVL nào trong định mức BOM của sản phẩm này.</td></tr>';
+    tbody.innerHTML =
+      '<tr><td colspan="6" class="text-center text-muted">Chưa có NVL nào trong định mức BOM của sản phẩm này.</td></tr>';
     return;
   }
 
@@ -186,11 +295,21 @@ function renderBomModalList(maSp) {
     const r = rows[i];
     html +=
       "<tr>" +
-      "<td><b>" + escapeHtml(r.ma_hang) + "</b></td>" +
-      "<td>" + escapeHtml(r.ten_hang) + "</td>" +
-      "<td>" + escapeHtml(r.don_vi_tinh) + "</td>" +
-      "<td><b>" + fmt(r.dinh_muc) + "</b></td>" +
-      "<td>" + escapeHtml(r.ghi_chu || "-") + "</td>" +
+      "<td><b>" +
+      escapeHtml(r.ma_hang) +
+      "</b></td>" +
+      "<td>" +
+      escapeHtml(r.ten_hang) +
+      "</td>" +
+      "<td>" +
+      escapeHtml(r.don_vi_tinh) +
+      "</td>" +
+      "<td><b>" +
+      fmt(r.dinh_muc) +
+      "</b></td>" +
+      "<td>" +
+      escapeHtml(r.ghi_chu || "-") +
+      "</td>" +
       `<td><button type="button" class="danger btn-sm" onclick="removeBomEntry('${escapeHtml(r.ma_sp)}', '${escapeHtml(r.ma_hang)}')">Xóa</button></td>` +
       "</tr>";
   }
@@ -223,12 +342,20 @@ export function registerPartnerGlobals(reloadCallback) {
   window.saveEditSupplier = async function () {
     try {
       const payload = {
-        ma_ncc: el("editSupCode").value, ten_ncc: el("editSupName").value.trim(), dia_chi: el("editSupAddress").value.trim(),
-        so_dt: el("editSupPhone").value.trim(), nguoi_lien_he: el("editSupContact").value.trim(),
-        email: el("editSupEmail").value.trim(), ghi_chu: el("editSupNote").value.trim(),
+        ma_ncc: el("editSupCode").value,
+        ten_ncc: el("editSupName").value.trim(),
+        dia_chi: el("editSupAddress").value.trim(),
+        so_dt: el("editSupPhone").value.trim(),
+        nguoi_lien_he: el("editSupContact").value.trim(),
+        email: el("editSupEmail").value.trim(),
+        ghi_chu: el("editSupNote").value.trim(),
       };
-      if (!payload.ten_ncc) return showToast("Tên nhà cung cấp không được để trống.", true);
-      await api("/api/kho/suppliers/edit", { method: "POST", body: JSON.stringify(payload) });
+      if (!payload.ten_ncc)
+        return showToast("Tên nhà cung cấp không được để trống.", true);
+      await api("/api/kho/suppliers/edit", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
       window.closeEditSupplierModal();
       showToast("Đã cập nhật thông tin NCC.");
       if (typeof reloadCallback === "function") await reloadCallback();
@@ -240,7 +367,10 @@ export function registerPartnerGlobals(reloadCallback) {
   window.deleteSupplier = async function (maNcc) {
     if (!confirm("Xác nhận xóa / ẩn Nhà cung cấp [" + maNcc + "]?")) return;
     try {
-      const res = await api("/api/kho/suppliers/delete", { method: "POST", body: JSON.stringify({ ma_ncc: maNcc }) });
+      const res = await api("/api/kho/suppliers/delete", {
+        method: "POST",
+        body: JSON.stringify({ ma_ncc: maNcc }),
+      });
       showToast(res.message || "Đã xóa / ẩn NCC.");
       if (typeof reloadCallback === "function") await reloadCallback();
     } catch (e) {
@@ -273,11 +403,18 @@ export function registerPartnerGlobals(reloadCallback) {
       // Cố ý KHÔNG gửi routing_map từ form bên Kho, để worker giữ nguyên lộ trình
       // công đoạn (nếu có) do bên Sản Xuất khai báo cho mã hàng này.
       const payload = {
-        ma_sp: el("editProductCode").value, ten_sp: el("editProductName").value.trim(),
-        quy_cach: el("editProductSpec").value.trim(), don_vi_tinh: el("editProductUnit").value, ghi_chu: el("editProductNote").value.trim(),
+        ma_sp: el("editProductCode").value,
+        ten_sp: el("editProductName").value.trim(),
+        quy_cach: el("editProductSpec").value.trim(),
+        don_vi_tinh: el("editProductUnit").value,
+        ghi_chu: el("editProductNote").value.trim(),
       };
-      if (!payload.ten_sp) return showToast("Tên sản phẩm không được để trống.", true);
-      await api("/api/products/edit", { method: "POST", body: JSON.stringify(payload) });
+      if (!payload.ten_sp)
+        return showToast("Tên sản phẩm không được để trống.", true);
+      await api("/api/products/edit", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
       window.closeEditProductModal();
       showToast("Đã cập nhật mã hàng sản xuất.");
       if (typeof reloadCallback === "function") await reloadCallback();
@@ -289,7 +426,10 @@ export function registerPartnerGlobals(reloadCallback) {
   window.deleteProduct = async function (maSp) {
     if (!confirm("Xác nhận xóa / ẩn Mã hàng SX [" + maSp + "]?")) return;
     try {
-      const res = await api("/api/products/delete", { method: "POST", body: JSON.stringify({ ma_sp: maSp }) });
+      const res = await api("/api/products/delete", {
+        method: "POST",
+        body: JSON.stringify({ ma_sp: maSp }),
+      });
       showToast(res.message || "Đã xóa / ẩn mã hàng.");
       if (typeof reloadCallback === "function") await reloadCallback();
     } catch (e) {
@@ -304,12 +444,22 @@ export function registerPartnerGlobals(reloadCallback) {
     if (!prod) return;
 
     el("bomModalSp").value = prod.ma_sp;
-    el("bomModalTitle").textContent = "Định mức BOM: " + prod.ma_sp + " - " + prod.ten_sp;
+    el("bomModalTitle").textContent =
+      "Định mức BOM: " + prod.ma_sp + " - " + prod.ten_sp;
 
     let itemOpts = '<option value="">-- Chọn NVL đưa vào BOM --</option>';
     for (let i = 0; i < state.inventoryData.length; i++) {
       const inv = state.inventoryData[i];
-      itemOpts += '<option value="' + escapeHtml(inv.ma_hang) + '">' + escapeHtml(inv.ma_hang) + " | " + escapeHtml(inv.ten_hang) + " (" + escapeHtml(inv.don_vi_tinh) + ")</option>";
+      itemOpts +=
+        '<option value="' +
+        escapeHtml(inv.ma_hang) +
+        '">' +
+        escapeHtml(inv.ma_hang) +
+        " | " +
+        escapeHtml(inv.ten_hang) +
+        " (" +
+        escapeHtml(inv.don_vi_tinh) +
+        ")</option>";
     }
     el("bomItemSelect").innerHTML = itemOpts;
     el("bomQtyInput").value = "";
@@ -329,10 +479,19 @@ export function registerPartnerGlobals(reloadCallback) {
     const dinhMuc = Number(el("bomQtyInput").value || 0);
     const ghiChu = el("bomNoteInput").value.trim();
 
-    if (!maSp || !maHang) return showToast("Vui lòng chọn Nguyên Vật Liệu.", true);
+    if (!maSp || !maHang)
+      return showToast("Vui lòng chọn Nguyên Vật Liệu.", true);
 
     try {
-      await api("/api/kho/bom/save", { method: "POST", body: JSON.stringify({ ma_sp: maSp, ma_hang: maHang, dinh_muc: dinhMuc, ghi_chu: ghiChu }) });
+      await api("/api/kho/bom/save", {
+        method: "POST",
+        body: JSON.stringify({
+          ma_sp: maSp,
+          ma_hang: maHang,
+          dinh_muc: dinhMuc,
+          ghi_chu: ghiChu,
+        }),
+      });
       showToast("Đã lưu định mức BOM.");
       el("bomQtyInput").value = "";
       el("bomNoteInput").value = "";
@@ -345,7 +504,10 @@ export function registerPartnerGlobals(reloadCallback) {
 
   window.removeBomEntry = async function (maSp, maHang) {
     try {
-      await api("/api/kho/bom/delete", { method: "POST", body: JSON.stringify({ ma_sp: maSp, ma_hang: maHang }) });
+      await api("/api/kho/bom/delete", {
+        method: "POST",
+        body: JSON.stringify({ ma_sp: maSp, ma_hang: maHang }),
+      });
       showToast("Đã gỡ NVL khỏi BOM.");
       if (typeof reloadCallback === "function") await reloadCallback();
       renderBomModalList(maSp);
@@ -363,20 +525,35 @@ function renderCutRatioModalList(maSp) {
   });
 
   if (rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Chưa khai báo tỷ lệ cắt nào cho sản phẩm này.</td></tr>';
+    tbody.innerHTML =
+      '<tr><td colspan="6" class="text-center text-muted">Chưa khai báo tỷ lệ cắt nào cho sản phẩm này.</td></tr>';
     return;
   }
 
   let html = "";
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
+    const chieuDai =
+      Number(r.chieu_dai_chuan_m) > 0
+        ? "1 cây = " + fmt(r.chieu_dai_chuan_m) + "m"
+        : "-";
     html +=
       "<tr>" +
-      "<td><b>" + escapeHtml(r.ma_hang) + "</b></td>" +
-      "<td>" + escapeHtml(r.ten_hang) + "</td>" +
-      "<td>" + (Number(r.chieu_dai_chuan_m) > 0 ? fmt(r.chieu_dai_chuan_m) + " m" : "-") + "</td>" +
-      "<td><b>" + fmt(r.so_con_moi_cay) + "</b></td>" +
-      "<td>" + escapeHtml(r.ghi_chu || "-") + "</td>" +
+      "<td><b>" +
+      escapeHtml(r.ma_hang) +
+      "</b></td>" +
+      "<td>" +
+      escapeHtml(r.ten_hang) +
+      "</td>" +
+      "<td>" +
+      chieuDai +
+      "</td>" +
+      "<td><b>" +
+      fmt(r.so_con_moi_cay) +
+      " pcs/cây</b></td>" +
+      "<td>" +
+      escapeHtml(r.ghi_chu || "-") +
+      "</td>" +
       `<td><button type="button" class="danger btn-sm" onclick="removeCutRatioEntry('${escapeHtml(r.ma_sp)}', '${escapeHtml(r.ma_hang)}')">Xóa</button></td>` +
       "</tr>";
   }
@@ -391,14 +568,32 @@ export function registerCutRatioGlobals(reloadCallback) {
     if (!prod) return;
 
     el("cutRatioModalSp").value = prod.ma_sp;
-    el("cutRatioModalTitle").textContent = "Tỷ lệ cắt: " + prod.ma_sp + " - " + prod.ten_sp;
+    el("cutRatioModalTitle").textContent =
+      "Tỷ lệ cắt: " + prod.ma_sp + " - " + prod.ten_sp;
 
-    // Chỉ liệt kê NVL dạng cây/thanh (đã khai báo hệ số Kg/mét)
+    // Liệt kê mọi NVL có khai báo chiều dài cây, hệ số Kg/m, hoặc ĐVT là Cây/Mét/Thanh
     let itemOpts = '<option value="">-- Chọn NVL dạng cây/thanh --</option>';
     for (let i = 0; i < state.inventoryData.length; i++) {
       const inv = state.inventoryData[i];
-      if (!(Number(inv.he_so_kg_m) > 0)) continue;
-      itemOpts += '<option value="' + escapeHtml(inv.ma_hang) + '">' + escapeHtml(inv.ma_hang) + " | " + escapeHtml(inv.ten_hang) + (Number(inv.chieu_dai_chuan_m) > 0 ? " (cây " + fmt(inv.chieu_dai_chuan_m) + "m)" : "") + "</option>";
+      const isBar =
+        Number(inv.he_so_kg_m) > 0 ||
+        Number(inv.chieu_dai_chuan_m) > 0 ||
+        ["Cây", "Mét", "Thanh", "Bó", "Kg"].includes(inv.don_vi_tinh);
+      if (!isBar) continue;
+
+      const lenInfo =
+        Number(inv.chieu_dai_chuan_m) > 0
+          ? " (1 cây = " + fmt(inv.chieu_dai_chuan_m) + "m)"
+          : "";
+      itemOpts +=
+        '<option value="' +
+        escapeHtml(inv.ma_hang) +
+        '">' +
+        escapeHtml(inv.ma_hang) +
+        " | " +
+        escapeHtml(inv.ten_hang) +
+        lenInfo +
+        "</option>";
     }
     el("cutRatioItemSelect").innerHTML = itemOpts;
     el("cutRatioQtyInput").value = "";
@@ -418,11 +613,20 @@ export function registerCutRatioGlobals(reloadCallback) {
     const soCon = Number(el("cutRatioQtyInput").value || 0);
     const ghiChu = el("cutRatioNoteInput").value.trim();
 
-    if (!maSp || !maHang) return showToast("Vui lòng chọn Nguyên Vật Liệu dạng cây/thanh.", true);
+    if (!maSp || !maHang)
+      return showToast("Vui lòng chọn Nguyên Vật Liệu dạng cây/thanh.", true);
     if (soCon <= 0) return showToast("Số con/cây phải lớn hơn 0.", true);
 
     try {
-      await api("/api/kho/cat-ratio/save", { method: "POST", body: JSON.stringify({ ma_sp: maSp, ma_hang: maHang, so_con_moi_cay: soCon, ghi_chu: ghiChu }) });
+      await api("/api/kho/cat-ratio/save", {
+        method: "POST",
+        body: JSON.stringify({
+          ma_sp: maSp,
+          ma_hang: maHang,
+          so_con_moi_cay: soCon,
+          ghi_chu: ghiChu,
+        }),
+      });
       showToast("Đã lưu tỷ lệ cắt.");
       el("cutRatioQtyInput").value = "";
       el("cutRatioNoteInput").value = "";
@@ -435,7 +639,10 @@ export function registerCutRatioGlobals(reloadCallback) {
 
   window.removeCutRatioEntry = async function (maSp, maHang) {
     try {
-      await api("/api/kho/cat-ratio/delete", { method: "POST", body: JSON.stringify({ ma_sp: maSp, ma_hang: maHang }) });
+      await api("/api/kho/cat-ratio/delete", {
+        method: "POST",
+        body: JSON.stringify({ ma_sp: maSp, ma_hang: maHang }),
+      });
       showToast("Đã xóa tỷ lệ cắt.");
       if (typeof reloadCallback === "function") await reloadCallback();
       renderCutRatioModalList(maSp);

@@ -1,480 +1,1464 @@
 // ============================================================
-// CHẾ ĐỘ MOCK: giả lập toàn bộ worker.js bằng dữ liệu trong bộ nhớ,
-// để test app mà chưa cần deploy Cloudflare Worker/D1 thật.
-// Chỉ bật khi URL có ?mock=1 (xem index.html) - không ảnh hưởng gì
-// khi chạy thật với backend thật.
+// MOCK API & DỮ LIỆU TESTER CHUẨN THỰC TẾ XƯỞNG: KHO NVL + SẢN XUẤT (EMS)
+// Kích hoạt bằng cách mở URL: index.html?mock=1
 // ============================================================
 
-function nowStr() {
-  return new Date().toISOString().slice(0, 19).replace("T", " ");
-}
-function uuidLike() {
-  return Math.random().toString(36).slice(2, 10);
-}
-
-// ---- Dữ liệu seed, khớp với schema_unified.sql ----
-const db = {
-  nguoiDung: [
-    { ma_nv: "ADMIN", ten_nv: "Quản trị viên hệ thống", password: "123", role: "ADMIN", he_thong: "ALL", bo_phan: "VP", line_id: null, must_change_password: 0 },
-    { ma_nv: "VP01", ten_nv: "Nhân viên Kho VP", password: "123", role: "USER", he_thong: "KHO", bo_phan: "VP", line_id: null, must_change_password: 0 },
-    { ma_nv: "XUONG01", ten_nv: "Tổ sản xuất 01", password: "123", role: "USER", he_thong: "KHO", bo_phan: "XUONG", line_id: null, must_change_password: 0 },
-    { ma_nv: "LEADER_NC", ten_nv: "Tổ trưởng chuyền NC", password: "123", role: "LEADER", he_thong: "SX", bo_phan: null, line_id: "NC", must_change_password: 0 },
-  ],
-  nhaCungCap: [
-    { ma_ncc: "NCC001", ten_ncc: "Nhà cung cấp Thép Việt Nhật", dia_chi: "TP.HCM", so_dt: "0901234567", nguoi_lien_he: "Nguyễn Văn A", email: "vietnhat@supplier.com", ghi_chu: "", active: 1 },
-    { ma_ncc: "NCC002", ten_ncc: "Công ty Hóa Chất Minh Trí", dia_chi: "Bình Dương", so_dt: "0908765432", nguoi_lien_he: "Trần Thị B", email: "minhtri@supplier.com", ghi_chu: "", active: 1 },
-  ],
-  danhMucNvl: [
-    { ma_hang: "NVL001", phan_loai: "Hóa Chất", ten_hang: "Dung dịch tẩy rửa công nghiệp", quy_cach: "Can 20L", don_vi_tinh: "Lít", ma_ncc: "NCC002", trang_thai: "ACTIVE", ghi_chu: "Bảo quản nơi thoáng mát", he_so_kg_m: 0, chieu_dai_chuan_m: 0, ma_goc: "" },
-    { ma_hang: "NVL002", phan_loai: "Bao Bì", ten_hang: "Thùng carton 5 lớp", quy_cach: "500x400x300 mm", don_vi_tinh: "Cái", ma_ncc: "NCC001", trang_thai: "ACTIVE", ghi_chu: "", he_so_kg_m: 0, chieu_dai_chuan_m: 0, ma_goc: "" },
-    { ma_hang: "NVL003", phan_loai: "Kim Loại", ten_hang: "Thép tròn đặc C45", quy_cach: "Ø20 mm x 6m", don_vi_tinh: "Cây", ma_ncc: "NCC001", trang_thai: "ACTIVE", ghi_chu: "Quy đổi chuẩn: 2.47 Kg/m, cây dài 6m", he_so_kg_m: 2.47, chieu_dai_chuan_m: 6, ma_goc: "" },
-    { ma_hang: "NVL004", phan_loai: "Phế Liệu", ten_hang: "Phế liệu thép cắt", quy_cach: "Đầu/đuôi dư khi cắt thép cây các loại", don_vi_tinh: "Kg", ma_ncc: "NCC001", trang_thai: "ACTIVE", ghi_chu: "Mã dùng chung cho mọi loại thép cây", he_so_kg_m: 0, chieu_dai_chuan_m: 0, ma_goc: "" },
-  ],
-  sanPham: [
-    { ma_sp: "SP001", ten_sp: "Trục dẫn hướng máy CNC", quy_cach: "Ø20 x 500mm, tôi cao tần", don_vi_tinh: "Cái", routing_map: JSON.stringify([{ order: 1, stage_id: "CAT" }, { order: 2, stage_id: "NHIET_LUYEN" }, { order: 3, stage_id: "NC1" }, { order: 4, stage_id: "KIEM_TRA" }]), ghi_chu: "Mã bản vẽ: DWG-SP01", active: 1 },
-    { ma_sp: "SP002", ten_sp: "Bạc đạn trượt tuyến tính", quy_cach: "Size 30mm", don_vi_tinh: "Bộ", routing_map: null, ghi_chu: "Gia công chính xác, chỉ theo dõi BOM kho", active: 1 },
-  ],
-  dinhMucBom: [
-    { id: 1, ma_sp: "SP001", ma_hang: "NVL003", dinh_muc: 0.1, ghi_chu: "Khoảng 0.1 cây mỗi SP (tham khảo)" },
-    { id: 2, ma_sp: "SP001", ma_hang: "NVL001", dinh_muc: 0.1, ghi_chu: "Hóa chất tẩy rửa sau gia công" },
-    { id: 3, ma_sp: "SP001", ma_hang: "NVL002", dinh_muc: 0.05, ghi_chu: "Đóng thùng 20 cái/thùng" },
-  ],
-  dinhMucCat: [{ id: 1, ma_sp: "SP001", ma_hang: "NVL003", so_con_moi_cay: 11, ghi_chu: "Trục dài 500mm, cắt từ cây 6m, đã trừ hao hụt lưỡi cưa" }],
-  giaoDichNvl: [
-    { id: 1, ma_hang: "NVL001", loai_giao_dich: "OPENING", so_luong: 500, delta_kho: 500, delta_xuong: 0, trang_thai: "approved", nguoi_giao_dich: "ADMIN", ma_sp_sx: "", ma_ncc: "", so_chung_tu: "", quy_cach_gd: "", khoi_luong_kg: 0, don_gia: 0, ghi_chu: "Tồn đầu kỳ ban đầu", thoi_gian_gd: nowStr() },
-    { id: 2, ma_hang: "NVL002", loai_giao_dich: "OPENING", so_luong: 1200, delta_kho: 1000, delta_xuong: 200, trang_thai: "approved", nguoi_giao_dich: "ADMIN", ma_sp_sx: "", ma_ncc: "", so_chung_tu: "", quy_cach_gd: "", khoi_luong_kg: 0, don_gia: 0, ghi_chu: "Tồn đầu kỳ ban đầu", thoi_gian_gd: nowStr() },
-    { id: 3, ma_hang: "NVL003", loai_giao_dich: "OPENING", so_luong: 60, delta_kho: 50, delta_xuong: 10, trang_thai: "approved", nguoi_giao_dich: "ADMIN", ma_sp_sx: "", ma_ncc: "", so_chung_tu: "", quy_cach_gd: "", khoi_luong_kg: 0, don_gia: 0, ghi_chu: "Tồn đầu kỳ ban đầu (cây)", thoi_gian_gd: nowStr() },
-  ],
-  lines: [
-    { line_id: "CUTTING", line_name: "Cắt", display_order: 1 }, { line_id: "NC", line_name: "NC", display_order: 2 }, { line_id: "MNC", line_name: "MNC", display_order: 3 },
-    { line_id: "GS_GV", line_name: "GS-GV", display_order: 4 }, { line_id: "GP_GE_GI", line_name: "GP-GE-GI", display_order: 5 }, { line_id: "ASSY", line_name: "Lắp ráp", display_order: 6 }, { line_id: "KENSA", line_name: "Kiểm tra", display_order: 7 },
-  ],
-  stages: [
-    { stage_id: "CAT", line_id: "CUTTING", stage_name: "Cắt", display_order: 1 }, { stage_id: "NHIET_LUYEN", line_id: "CUTTING", stage_name: "Nhiệt luyện", display_order: 2 }, { stage_id: "DO_CUNG", line_id: "CUTTING", stage_name: "Độ cứng", display_order: 3 },
-    { stage_id: "NC1", line_id: "NC", stage_name: "NC1", display_order: 4 }, { stage_id: "NC2", line_id: "NC", stage_name: "NC2", display_order: 5 }, { stage_id: "NC3", line_id: "NC", stage_name: "NC3", display_order: 6 },
-    { stage_id: "MNC1", line_id: "MNC", stage_name: "MNC1", display_order: 7 }, { stage_id: "MNC2", line_id: "MNC", stage_name: "MNC2", display_order: 8 }, { stage_id: "MNC3", line_id: "MNC", stage_name: "MNC3", display_order: 9 },
-    { stage_id: "GS", line_id: "GS_GV", stage_name: "GS", display_order: 10 }, { stage_id: "GV", line_id: "GS_GV", stage_name: "GV", display_order: 11 },
-    { stage_id: "GP", line_id: "GP_GE_GI", stage_name: "GP", display_order: 12 }, { stage_id: "GE", line_id: "GP_GE_GI", stage_name: "GE", display_order: 13 }, { stage_id: "GI", line_id: "GP_GE_GI", stage_name: "GI", display_order: 14 },
-    { stage_id: "LAP_RAP", line_id: "ASSY", stage_name: "Lắp ráp", display_order: 15 }, { stage_id: "DONG_THUNG", line_id: "ASSY", stage_name: "Đóng thùng", display_order: 16 }, { stage_id: "XUAT_GCN", line_id: "ASSY", stage_name: "Đi GCN", display_order: 17 }, { stage_id: "NHAN_GCN", line_id: "ASSY", stage_name: "Nhận GCN", display_order: 18 },
-    { stage_id: "KIEM_TRA", line_id: "KENSA", stage_name: "Kiểm tra", display_order: 19 },
-  ],
-  machines: [
-    { id: 1, machine_code: "NC-M01", machine_name: "Máy NC số 1", line_id: "NC" },
-    { id: 2, machine_code: "NC-M02", machine_name: "Máy NC số 2", line_id: "NC" },
-    { id: 3, machine_code: "MNC-M01", machine_name: "Máy MNC số 1", line_id: "MNC" },
-  ],
-  machineAllocations: [],
-  productionOrders: [{ po_number: "PO2610-01", ma_sp: "SP001", production_date: nowStr().slice(0, 10), total_qty: 100, status: "OPEN" }],
-  inventory: [{ ma_sp: "SP001", lot_number: "PO2610-01", stage_id: "CAT", quantity: 100, updated_at: nowStr() }],
-  transactionsLog: [],
-};
-let nextGdId = 4;
-let nextMachineAllocId = 1;
-
-function tonNvl(maHang) {
-  let ton_kho = 0, ton_xuong = 0;
-  db.giaoDichNvl.forEach((g) => {
-    if (g.ma_hang === maHang && g.trang_thai === "approved") {
-      ton_kho += g.delta_kho;
-      ton_xuong += g.delta_xuong;
-    }
-  });
-  return { ton_kho, ton_xuong };
-}
-
-function movementFor(type, qty) {
-  const q = Number(qty);
-  const map = {
-    NHAP_KHO: { dk: q, dx: 0 }, XUAT_XUONG: { dk: -q, dx: q }, XUAT_SAN_XUAT: { dk: -q, dx: q },
-    TRA_KHO: { dk: q, dx: -q }, HOAN_TRA_XUONG: { dk: q, dx: -q }, HUY_KHO: { dk: -q, dx: 0 }, HUY_XUONG: { dk: 0, dx: -q },
-  };
-  return map[type] || null;
-}
-
-function jsonRes(data, status) {
-  return new Response(JSON.stringify(data), { status: status || 200, headers: { "Content-Type": "application/json" } });
-}
-function badRes(message, status) {
-  return jsonRes({ error: message }, status || 400);
-}
-
-async function readBody(opts) {
-  try {
-    return JSON.parse(opts.body || "{}");
-  } catch (e) {
-    return {};
-  }
-}
-
-export async function mockFetch(url, opts) {
-  const u = new URL(url);
-  const path = u.pathname;
-  const method = (opts && opts.method) || "GET";
-
-  // ---- DÙNG CHUNG ----
-  if (path === "/api/login" && method === "POST") {
-    const p = await readBody(opts);
-    const maNv = String(p.ma_nv || "").toUpperCase().trim();
-    const user = db.nguoiDung.find((x) => x.ma_nv === maNv && x.password === String(p.password || ""));
-    if (!user) return badRes("Sai tài khoản hoặc mật khẩu.", 401);
-    return jsonRes({ ma_nv: user.ma_nv, ten_nv: user.ten_nv, role: user.role, he_thong: user.he_thong, bo_phan: user.bo_phan, line_id: user.line_id, must_change_password: Boolean(user.must_change_password) });
-  }
-  if (path === "/api/change-password" && method === "POST") {
-    const p = await readBody(opts);
-    const user = db.nguoiDung.find((x) => x.ma_nv === String(p.ma_nv || "").toUpperCase());
-    if (user) {
-      user.password = p.new_password;
-      user.must_change_password = 0;
-    }
-    return jsonRes({ success: true });
-  }
-
-  if (path === "/api/lines" && method === "GET") return jsonRes({ data: db.lines });
-  if (path === "/api/lines" && method === "POST") {
-    const p = await readBody(opts);
-    const lineId = String(p.line_id || "").toUpperCase();
-    if (db.lines.find((l) => l.line_id === lineId)) return badRes(`Mã Line '${lineId}' đã tồn tại.`);
-    db.lines.push({ line_id: lineId, line_name: p.line_name, display_order: db.lines.length + 1 });
-    return jsonRes({ success: true, line_id: lineId });
-  }
-
-  if (path === "/api/stages" && method === "GET") return jsonRes({ data: db.stages.map((s) => ({ ...s, id: s.stage_id })) });
-  if (path === "/api/stages" && method === "POST") {
-    const p = await readBody(opts);
-    const stageId = String(p.stage_id || "").toUpperCase();
-    if (db.stages.find((s) => s.stage_id === stageId)) return badRes(`Mã công đoạn '${stageId}' đã tồn tại.`);
-    db.stages.push({ stage_id: stageId, line_id: String(p.line_id || "").toUpperCase(), stage_name: p.stage_name, display_order: db.stages.length + 1 });
-    return jsonRes({ success: true, stage_id: stageId });
-  }
-
-  if (path === "/api/machines" && method === "GET") {
-    const lineId = u.searchParams.get("line_id");
-    const list = lineId ? db.machines.filter((m) => m.line_id === lineId) : db.machines;
-    return jsonRes({ data: list });
-  }
-  if (path === "/api/machines" && method === "POST") {
-    const p = await readBody(opts);
-    const code = String(p.machine_code || "").toUpperCase();
-    if (db.machines.find((m) => m.machine_code === code)) return badRes(`Mã máy '${code}' đã tồn tại.`);
-    db.machines.push({ id: db.machines.length + 1, machine_code: code, machine_name: p.machine_name, line_id: String(p.line_id || "").toUpperCase() });
-    return jsonRes({ success: true });
-  }
-
-  if (path === "/api/machine-allocations" && method === "POST") {
-    const p = await readBody(opts);
-    const stageId = String(p.stage_id || "").toUpperCase();
-    const inv = db.inventory.find((i) => i.lot_number === p.lot_number && i.stage_id.toUpperCase() === stageId);
-    const available = inv ? inv.quantity : 0;
-    const allocated = db.machineAllocations.filter((a) => a.lot_number === p.lot_number && a.stage_id === stageId).reduce((s, a) => s + a.qty, 0);
-    if (Number(p.qty) > available - allocated) return badRes(`Số lượng phân bổ vượt phần còn lại chưa phân bổ (${available - allocated}).`);
-    const machine = db.machines.find((m) => m.id === Number(p.machine_id));
-    db.machineAllocations.push({ id: nextMachineAllocId++, lot_number: p.lot_number, stage_id: stageId, machine_id: Number(p.machine_id), machine_code: machine ? machine.machine_code : "", qty: Number(p.qty), input_date: p.input_date, output_date: p.output_date, status: "PLANNED" });
-    return jsonRes({ success: true });
-  }
-  if (path === "/api/leader/machine-allocations" && method === "GET") {
-    const lot = u.searchParams.get("lot_number");
-    const stageId = (u.searchParams.get("stage_id") || "").toUpperCase();
-    const list = db.machineAllocations.filter((a) => a.lot_number === lot && (!stageId || a.stage_id === stageId));
-    return jsonRes({ data: list });
-  }
-
-  if (path === "/api/products" && method === "GET") return jsonRes({ products: db.sanPham.filter((p) => p.active) });
-  if (path === "/api/products" && method === "POST") {
-    const p = await readBody(opts);
-    let maSp = (p.ma_sp || "").toUpperCase();
-    if (!maSp) {
-      const nums = db.sanPham.filter((x) => /^SP\d+$/.test(x.ma_sp)).map((x) => Number(x.ma_sp.slice(2)));
-      maSp = "SP" + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(3, "0");
-    }
-    if (db.sanPham.find((x) => x.ma_sp === maSp)) return badRes(`Mã sản phẩm '${maSp}' đã tồn tại.`);
-    db.sanPham.push({ ma_sp: maSp, ten_sp: p.ten_sp, quy_cach: p.quy_cach || "", don_vi_tinh: p.don_vi_tinh || "Cái", routing_map: Array.isArray(p.routing_map) && p.routing_map.length ? JSON.stringify(p.routing_map) : null, ghi_chu: p.ghi_chu || "", active: 1 });
-    return jsonRes({ success: true, ma_sp: maSp });
-  }
-  if (path === "/api/products/edit" && method === "POST") {
-    const p = await readBody(opts);
-    const sp = db.sanPham.find((x) => x.ma_sp === p.ma_sp);
-    if (sp) {
-      sp.ten_sp = p.ten_sp;
-      sp.quy_cach = p.quy_cach || "";
-      sp.don_vi_tinh = p.don_vi_tinh || "Cái";
-      sp.ghi_chu = p.ghi_chu || "";
-      if (Object.prototype.hasOwnProperty.call(p, "routing_map")) sp.routing_map = Array.isArray(p.routing_map) && p.routing_map.length ? JSON.stringify(p.routing_map) : null;
-    }
-    return jsonRes({ success: true });
-  }
-  if (path === "/api/products/delete" && method === "POST") {
-    const p = await readBody(opts);
-    const sp = db.sanPham.find((x) => x.ma_sp === p.ma_sp);
-    if (sp) sp.active = 0;
-    return jsonRes({ success: true, mode: "deactivated", message: "Đã ẩn mã hàng (mock)." });
-  }
-
-  // ---- KHO NVL ----
-  if (path === "/api/kho/bootstrap" && method === "GET") {
-    const items = db.danhMucNvl
-      .filter((d) => d.trang_thai !== "INACTIVE")
-      .map((d) => {
-        const ton = tonNvl(d.ma_hang);
-        const tong_nhap = db.giaoDichNvl.filter((g) => g.ma_hang === d.ma_hang && g.trang_thai === "approved" && g.loai_giao_dich === "NHAP_KHO").reduce((s, g) => s + g.so_luong, 0);
-        const tong_xuat_sx = db.giaoDichNvl.filter((g) => g.ma_hang === d.ma_hang && g.trang_thai === "approved" && ["XUAT_SAN_XUAT", "XUAT_XUONG"].includes(g.loai_giao_dich)).reduce((s, g) => s + g.so_luong, 0);
-        return { ...d, ...ton, tong_nhap, tong_xuat_sx };
-      });
-    const boms = db.dinhMucBom.map((b) => {
-      const d = db.danhMucNvl.find((x) => x.ma_hang === b.ma_hang);
-      return { ...b, ten_hang: d?.ten_hang, phan_loai: d?.phan_loai, quy_cach: d?.quy_cach, don_vi_tinh: d?.don_vi_tinh };
-    });
-    const cutRatios = db.dinhMucCat.map((c) => {
-      const d = db.danhMucNvl.find((x) => x.ma_hang === c.ma_hang);
-      return { ...c, ten_hang: d?.ten_hang, chieu_dai_chuan_m: d?.chieu_dai_chuan_m, he_so_kg_m: d?.he_so_kg_m };
-    });
-    return jsonRes({ items, nccs: db.nhaCungCap.filter((n) => n.active), products: db.sanPham.filter((p) => p.active), boms, cutRatios });
-  }
-
-  if (path === "/api/kho/items" && method === "POST") {
-    const p = await readBody(opts);
-    const nums = db.danhMucNvl.filter((x) => /^NVL\d+$/.test(x.ma_hang)).map((x) => Number(x.ma_hang.slice(3)));
-    const maHang = "NVL" + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(3, "0");
-    db.danhMucNvl.push({ ma_hang: maHang, phan_loai: p.phan_loai, ten_hang: p.ten_hang, quy_cach: p.quy_cach || "", don_vi_tinh: p.don_vi_tinh, ma_ncc: p.ma_ncc || "", trang_thai: "ACTIVE", ghi_chu: p.ghi_chu || "", he_so_kg_m: Number(p.he_so_kg_m || 0), chieu_dai_chuan_m: Number(p.chieu_dai_chuan_m || 0), ma_goc: p.ma_goc || "" });
-    return jsonRes({ success: true, ma_hang: maHang });
-  }
-  if (path === "/api/kho/items/edit" && method === "POST") {
-    const p = await readBody(opts);
-    const item = db.danhMucNvl.find((x) => x.ma_hang === p.ma_hang);
-    if (item) Object.assign(item, { phan_loai: p.phan_loai, ten_hang: p.ten_hang, quy_cach: p.quy_cach || "", don_vi_tinh: p.don_vi_tinh, ma_ncc: p.ma_ncc || "", ghi_chu: p.ghi_chu || "", he_so_kg_m: Number(p.he_so_kg_m || 0), chieu_dai_chuan_m: Number(p.chieu_dai_chuan_m || 0), ma_goc: p.ma_goc || "" });
-    return jsonRes({ success: true });
-  }
-  if (path === "/api/kho/items/delete" && method === "POST") {
-    const p = await readBody(opts);
-    const hasTx = db.giaoDichNvl.some((g) => g.ma_hang === p.ma_hang);
-    const item = db.danhMucNvl.find((x) => x.ma_hang === p.ma_hang);
-    if (hasTx) {
-      if (item) item.trang_thai = "INACTIVE";
-      return jsonRes({ success: true, mode: "deactivated", message: "NVL đã có lịch sử nên chuyển sang trạng thái Ẩn." });
-    }
-    db.danhMucNvl = db.danhMucNvl.filter((x) => x.ma_hang !== p.ma_hang);
-    return jsonRes({ success: true, mode: "deleted", message: "Đã xóa hoàn toàn NVL." });
-  }
-
-  if (path === "/api/kho/suppliers" && method === "POST") {
-    const p = await readBody(opts);
-    const nums = db.nhaCungCap.filter((x) => /^NCC\d+$/.test(x.ma_ncc)).map((x) => Number(x.ma_ncc.slice(3)));
-    const maNcc = "NCC" + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(3, "0");
-    db.nhaCungCap.push({ ma_ncc: maNcc, ten_ncc: p.ten_ncc, dia_chi: p.dia_chi || "", so_dt: p.so_dt || "", nguoi_lien_he: p.nguoi_lien_he || "", email: p.email || "", ghi_chu: p.ghi_chu || "", active: 1 });
-    return jsonRes({ success: true, ma_ncc: maNcc });
-  }
-  if (path === "/api/kho/suppliers/edit" && method === "POST") {
-    const p = await readBody(opts);
-    const n = db.nhaCungCap.find((x) => x.ma_ncc === p.ma_ncc);
-    if (n) Object.assign(n, { ten_ncc: p.ten_ncc, dia_chi: p.dia_chi || "", so_dt: p.so_dt || "", nguoi_lien_he: p.nguoi_lien_he || "", email: p.email || "", ghi_chu: p.ghi_chu || "" });
-    return jsonRes({ success: true });
-  }
-  if (path === "/api/kho/suppliers/delete" && method === "POST") {
-    const p = await readBody(opts);
-    const n = db.nhaCungCap.find((x) => x.ma_ncc === p.ma_ncc);
-    if (n) n.active = 0;
-    return jsonRes({ success: true, mode: "deactivated", message: "Đã ẩn NCC (mock)." });
-  }
-
-  if (path === "/api/kho/bom/save" && method === "POST") {
-    const p = await readBody(opts);
-    const exist = db.dinhMucBom.find((b) => b.ma_sp === p.ma_sp && b.ma_hang === p.ma_hang);
-    if (exist) Object.assign(exist, { dinh_muc: Number(p.dinh_muc || 0), ghi_chu: p.ghi_chu || "" });
-    else db.dinhMucBom.push({ id: db.dinhMucBom.length + 1, ma_sp: p.ma_sp, ma_hang: p.ma_hang, dinh_muc: Number(p.dinh_muc || 0), ghi_chu: p.ghi_chu || "" });
-    return jsonRes({ success: true });
-  }
-  if (path === "/api/kho/bom/delete" && method === "POST") {
-    const p = await readBody(opts);
-    db.dinhMucBom = db.dinhMucBom.filter((b) => !(b.ma_sp === p.ma_sp && b.ma_hang === p.ma_hang));
-    return jsonRes({ success: true });
-  }
-
-  if (path === "/api/kho/cat-ratio/save" && method === "POST") {
-    const p = await readBody(opts);
-    const exist = db.dinhMucCat.find((c) => c.ma_sp === p.ma_sp && c.ma_hang === p.ma_hang);
-    if (exist) Object.assign(exist, { so_con_moi_cay: Number(p.so_con_moi_cay || 0), ghi_chu: p.ghi_chu || "" });
-    else db.dinhMucCat.push({ id: db.dinhMucCat.length + 1, ma_sp: p.ma_sp, ma_hang: p.ma_hang, so_con_moi_cay: Number(p.so_con_moi_cay || 0), ghi_chu: p.ghi_chu || "" });
-    return jsonRes({ success: true });
-  }
-  if (path === "/api/kho/cat-ratio/delete" && method === "POST") {
-    const p = await readBody(opts);
-    db.dinhMucCat = db.dinhMucCat.filter((c) => !(c.ma_sp === p.ma_sp && c.ma_hang === p.ma_hang));
-    return jsonRes({ success: true });
-  }
-
-  if (path === "/api/kho/transactions" && method === "POST") {
-    const p = await readBody(opts);
-    for (const item of p.transactions || []) {
-      const mv = movementFor(item.loai_giao_dich, item.so_luong);
-      if (!mv) return badRes("Loại giao dịch không hợp lệ.");
-      const ton = tonNvl(item.ma_hang);
-      if (ton.ton_kho + mv.dk < -1e-9) return badRes(`${item.ma_hang}: Tồn kho không đủ cho giao dịch này.`);
-      if (ton.ton_xuong + mv.dx < -1e-9) return badRes(`${item.ma_hang}: Tồn tại xưởng không đủ cho giao dịch này.`);
-      db.giaoDichNvl.push({
-        id: nextGdId++, ma_hang: item.ma_hang, loai_giao_dich: item.loai_giao_dich, so_luong: Number(item.so_luong),
-        delta_kho: mv.dk, delta_xuong: mv.dx, trang_thai: "approved", nguoi_giao_dich: p.user_id,
-        ma_sp_sx: item.ma_sp_sx || "", ma_ncc: item.ma_ncc || "", so_chung_tu: item.so_chung_tu || "",
-        quy_cach_gd: item.quy_cach_gd || "", khoi_luong_kg: Number(item.khoi_luong_kg || 0), sl_phu: Number(item.sl_phu || 0), dvt_phu: item.dvt_phu || "",
-        don_gia: Number(item.don_gia || 0), ghi_chu: item.ghi_chu || "", thoi_gian_gd: p.tx_date + " " + nowStr().slice(11),
-      });
-    }
-    return jsonRes({ success: true, status: "approved", count: (p.transactions || []).length });
-  }
-
-  if (path === "/api/kho/history" && method === "GET") {
-    const rows = db.giaoDichNvl
-      .slice()
-      .reverse()
-      .map((g) => {
-        const d = db.danhMucNvl.find((x) => x.ma_hang === g.ma_hang);
-        const u2 = db.nguoiDung.find((x) => x.ma_nv === g.nguoi_giao_dich);
-        const s = db.sanPham.find((x) => x.ma_sp === g.ma_sp_sx);
-        const n = db.nhaCungCap.find((x) => x.ma_ncc === g.ma_ncc);
-        return { ...g, ten_hang: d?.ten_hang, phan_loai: d?.phan_loai, don_vi_tinh: d?.don_vi_tinh, ten_nv: u2?.ten_nv, bo_phan: u2?.bo_phan, ten_sp: s?.ten_sp, ten_ncc: n?.ten_ncc, loai_hien_thi: labelType(g.loai_giao_dich) };
-      });
-    return jsonRes({ rows });
-  }
-
-  if (path === "/api/kho/report/daily" && method === "GET") {
-    const from = u.searchParams.get("from"), to = u.searchParams.get("to");
-    const inRange = (g) => g.thoi_gian_gd.slice(0, 10) >= from && g.thoi_gian_gd.slice(0, 10) <= to && g.trang_thai === "approved" && g.loai_giao_dich !== "OPENING";
-    const rows = db.danhMucNvl.map((d) => {
-      const gs = db.giaoDichNvl.filter((g) => g.ma_hang === d.ma_hang && inRange(g));
-      const ton = tonNvl(d.ma_hang);
-      return {
-        ma_hang: d.ma_hang, ten_hang: d.ten_hang, phan_loai: d.phan_loai, don_vi_tinh: d.don_vi_tinh,
-        nhap: gs.filter((g) => g.loai_giao_dich === "NHAP_KHO").reduce((s, g) => s + g.so_luong, 0),
-        xuat_sx: gs.filter((g) => ["XUAT_SAN_XUAT", "XUAT_XUONG"].includes(g.loai_giao_dich)).reduce((s, g) => s + g.so_luong, 0),
-        tong_kg_nhap: gs.filter((g) => g.loai_giao_dich === "NHAP_KHO").reduce((s, g) => s + g.khoi_luong_kg, 0),
-        ton_kho: ton.ton_kho,
-      };
-    }).filter((r) => r.nhap > 0 || r.xuat_sx > 0);
-    return jsonRes({ rows, total: { nhap: rows.reduce((s, r) => s + r.nhap, 0), xuat_sx: rows.reduce((s, r) => s + r.xuat_sx, 0) }, chart_by_product: [], chart_by_category: [] });
-  }
-  if (path === "/api/kho/report/detail" && method === "GET") {
-    const maHang = u.searchParams.get("ma_hang");
-    const rows = db.giaoDichNvl.filter((g) => g.ma_hang === maHang && g.loai_giao_dich !== "OPENING").map((g) => ({ ...g, loai_hien_thi: labelType(g.loai_giao_dich) }));
-    return jsonRes({ rows });
-  }
-
-  // ---- SẢN XUẤT ----
-  if (path === "/api/sx/po/create" && method === "POST") {
-    const p = await readBody(opts);
-    const sp = db.sanPham.find((x) => x.ma_sp === String(p.product_code).toUpperCase());
-    if (!sp) return badRes("Mã hàng chưa khai báo.");
-    let firstStage = null;
-    if (sp.routing_map) {
-      const r = JSON.parse(sp.routing_map);
-      if (r.length) firstStage = r[0].stage_id.toUpperCase();
-    }
-    if (!firstStage) return badRes("Mã hàng chưa khai báo lộ trình công đoạn (routing).");
-    if (db.productionOrders.find((po) => po.po_number === p.po_number)) return badRes(`Số LOT '${p.po_number}' đã tồn tại.`);
-    db.productionOrders.push({ po_number: p.po_number, ma_sp: sp.ma_sp, production_date: p.production_date, total_qty: Number(p.total_qty), status: "OPEN" });
-    db.inventory.push({ ma_sp: sp.ma_sp, lot_number: p.po_number, stage_id: firstStage, quantity: Number(p.total_qty), updated_at: nowStr() });
-    return jsonRes({ success: true });
-  }
-
-  if (path === "/api/sx/move" && method === "POST") {
-    const p = await readBody(opts);
-    const fromStage = String(p.from_stage || "").toUpperCase();
-    const qPass = parseInt(p.qty_pass) || 0, qNG = parseInt(p.qty_ng) || 0;
-    const inv = db.inventory.find((i) => i.lot_number === p.lot_number && i.stage_id.toUpperCase() === fromStage);
-    if (!inv) return badRes("Không tìm thấy LOT tại công đoạn này.");
-    if (qPass + qNG > inv.quantity) return badRes(`Số lượng thao tác (${qPass + qNG}) vượt quá số lượng tồn (${inv.quantity})!`);
-    const sp = db.sanPham.find((x) => x.ma_sp === inv.ma_sp);
-    let nextStage = "THANH_PHAM";
-    if (sp?.routing_map) {
-      const r = JSON.parse(sp.routing_map);
-      const idx = r.findIndex((s) => s.stage_id.toUpperCase() === fromStage);
-      if (idx !== -1 && idx < r.length - 1) nextStage = r[idx + 1].stage_id.toUpperCase();
-    }
-    inv.quantity -= qPass + qNG;
-    if (qPass > 0) upsertInventory(inv.ma_sp, p.lot_number, nextStage, qPass);
-    if (qNG > 0) upsertInventory(inv.ma_sp, p.lot_number, fromStage + "_NG", qNG);
-    if (qPass > 0) db.transactionsLog.push({ timestamp: nowStr(), user_id: p.user_id, lot_number: p.lot_number, from_stage: fromStage, to_stage: nextStage, qty: qPass, type: "PASS" });
-    if (qNG > 0) db.transactionsLog.push({ timestamp: nowStr(), user_id: p.user_id, lot_number: p.lot_number, from_stage: fromStage, to_stage: "KHO_NG", qty: qNG, type: "NG" });
-    return jsonRes({ success: true, routed_to: nextStage });
-  }
-
-  if (path === "/api/sx/ng/resolve" && method === "POST") {
-    const p = await readBody(opts);
-    const fromStage = String(p.from_stage || "").toUpperCase();
-    const ngStageId = fromStage + "_NG";
-    const inv = db.inventory.find((i) => i.lot_number === p.lot_number && i.stage_id.toUpperCase() === ngStageId);
-    if (!inv || inv.quantity < p.qty) return badRes("Số lượng NG hiện có không đủ để xử lý.");
-    inv.quantity -= p.qty;
-    if (p.action === "REWORK") upsertInventory(inv.ma_sp, p.lot_number, String(p.return_stage).toUpperCase(), p.qty);
-    db.transactionsLog.push({ timestamp: nowStr(), user_id: p.user_id, lot_number: p.lot_number, from_stage: ngStageId, to_stage: p.action === "REWORK" ? p.return_stage : "SCRAP", qty: p.qty, type: "NG" });
-    return jsonRes({ success: true });
-  }
-
-  if (path === "/api/sx/dashboard/matrix" && method === "GET") {
-    const grouped = {};
-    db.inventory.filter((i) => i.quantity > 0).forEach((i) => {
-      const key = i.lot_number;
-      if (!grouped[key]) grouped[key] = { lot_number: i.lot_number, product_code: i.ma_sp, production_date: db.productionOrders.find((po) => po.po_number === i.lot_number)?.production_date, total_qty: 0 };
-      grouped[key].total_qty += i.quantity;
-      grouped[key]["qty_" + i.stage_id.toLowerCase().replace("_ng", "")] = i.stage_id.toUpperCase().endsWith("_NG") ? undefined : i.quantity;
-      if (i.stage_id.toUpperCase().endsWith("_NG")) grouped[key]["ng_" + i.stage_id.toLowerCase().replace("_ng", "")] = i.quantity;
-      else grouped[key]["qty_" + i.stage_id.toLowerCase()] = i.quantity;
-      if (["THANH_PHAM", "THÀNH_PHẨM"].includes(i.stage_id.toUpperCase())) grouped[key].qty_done = (grouped[key].qty_done || 0) + i.quantity;
-    });
-    return jsonRes({ matrix: Object.values(grouped) });
-  }
-
-  if (path === "/api/sx/leader/pending" && method === "GET") {
-    const lineId = u.searchParams.get("line_id");
-    const validStages = db.stages.filter((s) => s.line_id === lineId).map((s) => s.stage_id);
-    const rows = db.inventory
-      .filter((i) => validStages.includes(i.stage_id.toUpperCase()) && i.quantity > 0)
-      .map((i) => {
-        const sp = db.sanPham.find((x) => x.ma_sp === i.ma_sp);
-        let toStageName = "Hoàn thành (Nhập kho)";
-        if (sp?.routing_map) {
-          const r = JSON.parse(sp.routing_map);
-          const idx = r.findIndex((s) => s.stage_id.toUpperCase() === i.stage_id.toUpperCase());
-          if (idx !== -1 && idx < r.length - 1) toStageName = r[idx + 1].stage_id.toUpperCase();
-        }
-        return { po_id: i.lot_number, po_number: i.lot_number, product_id: i.ma_sp, product_code: i.ma_sp, ten_sp: sp?.ten_sp, routing_map: sp?.routing_map, from_stage: i.stage_id, qty_available: i.quantity, to_stage_name: toStageName };
-      });
-    return jsonRes({ data: rows });
-  }
-
-  if (path === "/api/sx/ng/list" && method === "GET") {
-    const rows = db.inventory.filter((i) => i.stage_id.toUpperCase().endsWith("_NG") && i.quantity > 0).map((i) => ({ lot_number: i.lot_number, product_code: i.ma_sp, ng_qty: i.quantity }));
-    return jsonRes({ data: rows });
-  }
-
-  if (path === "/api/sx/history" && method === "GET") {
-    const rows = db.transactionsLog
-      .slice()
-      .reverse()
-      .map((t) => {
-        const u2 = db.nguoiDung.find((x) => x.ma_nv === t.user_id);
-        const po = db.productionOrders.find((p) => p.po_number === t.lot_number);
-        return { timestamp: t.timestamp, ten_nv: u2?.ten_nv, username: t.user_id, po_id: t.lot_number, type: t.type, qty: t.qty, from_stage: t.from_stage, to_stage: t.to_stage, product_code: po?.ma_sp || "UNKNOWN" };
-      });
-    return jsonRes({ data: rows });
-  }
-
-  return badRes("Mock API: không có route " + path, 404);
-}
-
-function upsertInventory(maSp, lotNumber, stageId, qty) {
-  const row = db.inventory.find((i) => i.ma_sp === maSp && i.lot_number === lotNumber && i.stage_id === stageId);
-  if (row) row.quantity += qty;
-  else db.inventory.push({ ma_sp: maSp, lot_number: lotNumber, stage_id: stageId, quantity: qty, updated_at: nowStr() });
-}
-
-function labelType(type) {
-  const map = { NHAP_KHO: "Nhập kho", XUAT_SAN_XUAT: "Xuất ra Line Sản Xuất", XUAT_XUONG: "Xuất cho xưởng", HOAN_TRA_XUONG: "Xưởng hoàn trả kho", TRA_KHO: "Trả kho", HUY_KHO: "Hủy / Kiểm kê giảm", HUY_XUONG: "Hủy tại xưởng", OPENING: "Tồn đầu kỳ" };
-  return map[type] || type;
-}
-
 export function installMockFetch() {
-  const originalFetch = window.fetch.bind(window);
-  window.fetch = function (url, opts) {
-    if (String(url).includes("/api/")) return mockFetch(url, opts || {});
-    return originalFetch(url, opts);
+  console.log(
+    "🧪 [TESTER MODE] Đã kích hoạt Mock API chuẩn hóa theo danh sách Line & Stage thực tế của xưởng.",
+  );
+
+  const db = {
+    users: [
+      {
+        ma_nv: "ADMIN",
+        password: "123",
+        ten_nv: "Vũ Quang Triết (Admin)",
+        role: "ADMIN",
+        he_thong: "ALL",
+        bo_phan: "VP",
+        line_id: null,
+        active: 1,
+      },
+      {
+        ma_nv: "VP01",
+        password: "123",
+        ten_nv: "Nguyễn Thị VY (VP Kho)",
+        role: "STAFF",
+        he_thong: "KHO",
+        bo_phan: "VP",
+        line_id: null,
+        active: 1,
+      },
+      {
+        ma_nv: "XUONG01",
+        password: "123",
+        ten_nv: "Phạm Văn Hiển (Kho Xưởng)",
+        role: "STAFF",
+        he_thong: "KHO",
+        bo_phan: "XUONG",
+        line_id: null,
+        active: 1,
+      },
+      {
+        ma_nv: "L_CUT",
+        password: "123",
+        ten_nv: "Trưởng Line Cắt",
+        role: "LEADER",
+        he_thong: "SX",
+        bo_phan: "SX",
+        line_id: "CUTTING",
+        active: 1,
+      },
+      {
+        ma_nv: "L_NC",
+        password: "123",
+        ten_nv: "Trưởng Line NC",
+        role: "LEADER",
+        he_thong: "SX",
+        bo_phan: "SX",
+        line_id: "NC",
+        active: 1,
+      },
+      {
+        ma_nv: "L_MNC",
+        password: "123",
+        ten_nv: "Trưởng Line MNC",
+        role: "LEADER",
+        he_thong: "SX",
+        bo_phan: "SX",
+        line_id: "MNC",
+        active: 1,
+      },
+      {
+        ma_nv: "L_GS",
+        password: "123",
+        ten_nv: "Trưởng Line Mài GS_GV",
+        role: "LEADER",
+        he_thong: "SX",
+        bo_phan: "SX",
+        line_id: "GS_GV",
+        active: 1,
+      },
+      {
+        ma_nv: "L_ASSY",
+        password: "123",
+        ten_nv: "Trưởng Line ASSY",
+        role: "LEADER",
+        he_thong: "SX",
+        bo_phan: "SX",
+        line_id: "ASSY",
+        active: 1,
+      },
+    ],
+
+    nccs: [
+      {
+        ma_ncc: "NCC001",
+        ten_ncc: "Thép Đặc Biệt Sanyo Việt Nam",
+        dia_chi: "KCN VSIP 2, Bình Dương",
+        so_dt: "02743888999",
+        nguoi_lien_he: "Anh Minh",
+        email: "sales@sanyo-steel.vn",
+        ghi_chu: "Cung cấp thép tròn đặc SUS304, S45C",
+        active: 1,
+      },
+      {
+        ma_ncc: "NCC002",
+        ten_ncc: "Hóa Chất & Dầu Nhờn Idemitsu",
+        dia_chi: "Quận 1, TP.HCM",
+        so_dt: "02839112233",
+        nguoi_lien_he: "Chị Lan",
+        email: "contact@idemitsu.vn",
+        ghi_chu: "Dầu cắt gọt, dung dịch chống gỉ",
+        active: 1,
+      },
+    ],
+
+    items: [
+      {
+        ma_hang: "NVL001",
+        phan_loai: "Kim Loại",
+        ten_hang: "Thép tròn đặc SUS304 Ø20",
+        quy_cach: "Ø20mm x 6m",
+        don_vi_tinh: "Cây",
+        ma_ncc: "NCC001",
+        he_so_kg_m: 2.47,
+        chieu_dai_chuan_m: 6,
+        ma_goc: "",
+        ton_kho: 38,
+        ton_xuong: 12,
+        trang_thai: "ACTIVE",
+        ghi_chu: "1 cây 6m nặng 14.82 Kg, cắt được 17 pcs SP001",
+      },
+      {
+        ma_hang: "NVL002",
+        phan_loai: "Kim Loại",
+        ten_hang: "Thép hợp kim S45C Ø32",
+        quy_cach: "Ø32mm x 6m",
+        don_vi_tinh: "Cây",
+        ma_ncc: "NCC001",
+        he_so_kg_m: 6.31,
+        chieu_dai_chuan_m: 6,
+        ma_goc: "",
+        ton_kho: 25,
+        ton_xuong: 5,
+        trang_thai: "ACTIVE",
+        ghi_chu: "1 cây 6m nặng 37.86 Kg, cắt được 12 pcs SP002",
+      },
+      {
+        ma_hang: "NVL003",
+        phan_loai: "Hóa Chất",
+        ten_hang: "Dầu cắt gọt pha nước Daphne",
+        quy_cach: "Phuy 200 Lít",
+        don_vi_tinh: "Lít",
+        ma_ncc: "NCC002",
+        he_so_kg_m: 0,
+        chieu_dai_chuan_m: 0,
+        ma_goc: "",
+        ton_kho: 180,
+        ton_xuong: 20,
+        trang_thai: "ACTIVE",
+        ghi_chu: "Dùng cho máy CNC Line NC & MNC",
+      },
+      {
+        ma_hang: "NVL004",
+        phan_loai: "Phế Liệu / Khúc Dư",
+        ten_hang: "Đầu mẫu dư SUS304 Ø20",
+        quy_cach: "Khúc ngắn < 350mm",
+        don_vi_tinh: "Kg",
+        ma_ncc: "NCC001",
+        he_so_kg_m: 2.47,
+        chieu_dai_chuan_m: 0,
+        ma_goc: "NVL001",
+        ton_kho: 15.5,
+        ton_xuong: 0,
+        trang_thai: "ACTIVE",
+        ghi_chu: "Khúc dư hoàn trả từ Line CUTTING",
+      },
+    ],
+
+    // Danh sách Line thực tế của xưởng
+    lines: [
+      { line_id: "CUTTING", line_name: "Line(CUTTING)", display_order: 1 },
+      { line_id: "NC", line_name: "Line(NC)", display_order: 2 },
+      { line_id: "MNC", line_name: "Line(MNC)", display_order: 3 },
+      { line_id: "GS_GV", line_name: "Line(GS_GV)", display_order: 4 },
+      { line_id: "GP_TI_GE", line_name: "Line(GP_TI_GE)", display_order: 5 },
+      { line_id: "ASSY", line_name: "Line(ASSY)", display_order: 6 },
+      { line_id: "KENSA", line_name: "Line(KENSA)", display_order: 7 },
+    ],
+
+    // Chuẩn hóa stage_id (ASCII không dấu để chạy mượt trên D1 SQLite) + stage_name đúng thực tế xưởng
+    stages: [
+      {
+        stage_id: "CAT",
+        line_id: "CUTTING",
+        stage_name: "Cắt",
+        display_order: 1,
+      },
+      {
+        stage_id: "NHIET_LUYEN",
+        line_id: "CUTTING",
+        stage_name: "Nhiệt luyện",
+        display_order: 2,
+      },
+      {
+        stage_id: "DO_CUNG",
+        line_id: "CUTTING",
+        stage_name: "Độ cứng",
+        display_order: 3,
+      },
+      { stage_id: "NC_1", line_id: "NC", stage_name: "NC1", display_order: 4 },
+      { stage_id: "NC_2", line_id: "NC", stage_name: "NC2", display_order: 5 },
+      { stage_id: "NC_3", line_id: "NC", stage_name: "NC3", display_order: 6 },
+      {
+        stage_id: "MNC_1",
+        line_id: "MNC",
+        stage_name: "MNC1",
+        display_order: 7,
+      },
+      {
+        stage_id: "MNC_2",
+        line_id: "MNC",
+        stage_name: "MNC2",
+        display_order: 8,
+      },
+      {
+        stage_id: "MNC_3",
+        line_id: "MNC",
+        stage_name: "MNC3",
+        display_order: 9,
+      },
+      { stage_id: "GS", line_id: "GS_GV", stage_name: "GS", display_order: 10 },
+      { stage_id: "GV", line_id: "GS_GV", stage_name: "GV", display_order: 11 },
+      {
+        stage_id: "LAP_RAP",
+        line_id: "ASSY",
+        stage_name: "Lắp Ráp",
+        display_order: 12,
+      },
+      {
+        stage_id: "DONG_THUNG",
+        line_id: "ASSY",
+        stage_name: "Đóng Thùng",
+        display_order: 13,
+      },
+      {
+        stage_id: "XUAT_GCN",
+        line_id: "ASSY",
+        stage_name: "Xuất GCN",
+        display_order: 14,
+      },
+      {
+        stage_id: "NHAP_GCN",
+        line_id: "ASSY",
+        stage_name: "Nhập GCN",
+        display_order: 15,
+      },
+      {
+        stage_id: "GP",
+        line_id: "GP_TI_GE",
+        stage_name: "GP",
+        display_order: 16,
+      },
+      {
+        stage_id: "TI",
+        line_id: "GP_TI_GE",
+        stage_name: "TI",
+        display_order: 17,
+      },
+      {
+        stage_id: "GE",
+        line_id: "GP_TI_GE",
+        stage_name: "GE",
+        display_order: 18,
+      },
+      {
+        stage_id: "KIEM_TRA",
+        line_id: "ASSY",
+        stage_name: "Kiểm Tra",
+        display_order: 19,
+      },
+    ],
+
+    // Sản phẩm đồng bộ đúng stage_id mới của xưởng
+    products: [
+      {
+        ma_sp: "SP001",
+        ten_sp: "Trục vít dẫn hướng SUS304 Ø20x340",
+        quy_cach: "Dài 340mm, tiện ren 2 đầu",
+        don_vi_tinh: "PCS",
+        routing_map: JSON.stringify([
+          { order: 1, stage_id: "CAT" },
+          { order: 2, stage_id: "NHIET_LUYEN" },
+          { order: 3, stage_id: "NC_1" },
+          { order: 4, stage_id: "MNC_1" },
+          { order: 5, stage_id: "GS" },
+          { order: 6, stage_id: "KIEM_TRA" },
+          { order: 7, stage_id: "DONG_THUNG" },
+        ]),
+        ghi_chu: "1 cây 6m cắt ra 17 pcs",
+        active: 1,
+      },
+      {
+        ma_sp: "SP002",
+        ten_sp: "Bích nối trục chịu lực S45C Ø32",
+        quy_cach: "Ø32x480mm, phay rãnh then",
+        don_vi_tinh: "PCS",
+        routing_map: JSON.stringify([
+          { order: 1, stage_id: "CAT" },
+          { order: 2, stage_id: "NC_1" },
+          { order: 3, stage_id: "MNC_1" },
+          { order: 4, stage_id: "LAP_RAP" },
+          { order: 5, stage_id: "KIEM_TRA" },
+          { order: 6, stage_id: "DONG_THUNG" },
+        ]),
+        ghi_chu: "1 cây 6m cắt ra 12 pcs",
+        active: 1,
+      },
+      {
+        ma_sp: "TB-30",
+        ten_sp: "Linear motion bearing",
+        quy_cach: " Chuẩn nhà máy",
+        don_vi_tinh: "PCS",
+        routing_map: JSON.stringify([
+          { order: 1, stage_id: "CAT" },
+          { order: 2, stage_id: "NC_1" },
+          { order: 3, stage_id: "GS" },
+          { order: 4, stage_id: "LAP_RAP" },
+          { order: 5, stage_id: "KIEM_TRA" },
+          { order: 6, stage_id: "DONG_THUNG" },
+        ]),
+        ghi_chu: "Bạc đạn trượt tuyến tính",
+        active: 1,
+      },
+    ],
+
+    boms: [
+      {
+        id: 1,
+        ma_sp: "SP001",
+        ma_hang: "NVL001",
+        dinh_muc: 0.059,
+        ghi_chu: "1 cây 6m cắt được 17 pcs (~0.0588 cây/sp)",
+      },
+      {
+        id: 2,
+        ma_sp: "SP001",
+        ma_hang: "NVL003",
+        dinh_muc: 0.05,
+        ghi_chu: "Dầu tưới nguội tiêu hao",
+      },
+      {
+        id: 3,
+        ma_sp: "SP002",
+        ma_hang: "NVL002",
+        dinh_muc: 0.083,
+        ghi_chu: "1 cây 6m cắt được 12 pcs",
+      },
+    ],
+
+    cutRatios: [
+      {
+        id: 1,
+        ma_sp: "SP001",
+        ma_hang: "NVL001",
+        so_con_moi_cay: 17,
+        ghi_chu: "Cắt phôi 345mm + mạch cưa 5mm = 17 pcs/cây 6m",
+      },
+      {
+        id: 2,
+        ma_sp: "SP002",
+        ma_hang: "NVL002",
+        so_con_moi_cay: 12,
+        ghi_chu: "Cắt phôi 490mm = 12 pcs/cây 6m",
+      },
+    ],
+
+    khoTransactions: [
+      {
+        id: 101,
+        thoi_gian_gd: "2026-10-24 08:15:00",
+        ma_hang: "NVL001",
+        loai_giao_dich: "NHAP_KHO",
+        so_luong: 50,
+        sl_phu: 300,
+        dvt_phu: "m",
+        quy_cach_gd: "1 cây = 6m (Tổng 300m)",
+        khoi_luong_kg: 741,
+        nguoi_giao_dich: "VP01",
+        ma_ncc: "NCC001",
+        ma_sp_sx: "",
+        so_chung_tu: "PNK-2410-01",
+        don_gia: 850000,
+        ghi_chu: "Nhập lô thép SUS304 đầu tuần",
+      },
+      {
+        id: 102,
+        thoi_gian_gd: "2026-10-24 09:30:00",
+        ma_hang: "NVL001",
+        loai_giao_dich: "XUAT_SAN_XUAT",
+        so_luong: 12,
+        sl_phu: 204,
+        dvt_phu: "pcs",
+        quy_cach_gd: "1 cây 6m = 17 pcs → Cắt 204 pcs",
+        khoi_luong_kg: 177.84,
+        nguoi_giao_dich: "XUONG01",
+        ma_ncc: "",
+        ma_sp_sx: "SP001",
+        so_chung_tu: "PXK-PO2510",
+        don_gia: 0,
+        ghi_chu: "Xuất 12 cây thép cắt 204 pcs cho PO2510",
+      },
+      {
+        id: 103,
+        thoi_gian_gd: "2026-10-24 10:00:00",
+        ma_hang: "NVL002",
+        loai_giao_dich: "NHAP_KHO",
+        so_luong: 30,
+        sl_phu: 180,
+        dvt_phu: "m",
+        quy_cach_gd: "1 cây = 6m (Tổng 180m)",
+        khoi_luong_kg: 1135.8,
+        nguoi_giao_dich: "VP01",
+        ma_ncc: "NCC001",
+        ma_sp_sx: "",
+        so_chung_tu: "PNK-2410-02",
+        don_gia: 1200000,
+        ghi_chu: "Nhập thép S45C Ø32",
+      },
+      {
+        id: 104,
+        thoi_gian_gd: "2026-10-24 14:20:00",
+        ma_hang: "NVL002",
+        loai_giao_dich: "XUAT_SAN_XUAT",
+        so_luong: 5,
+        sl_phu: 60,
+        dvt_phu: "pcs",
+        quy_cach_gd: "1 cây 6m = 12 pcs → Cắt 60 pcs",
+        khoi_luong_kg: 189.3,
+        nguoi_giao_dich: "XUONG01",
+        ma_ncc: "",
+        ma_sp_sx: "SP002",
+        so_chung_tu: "PXK-PO2511",
+        don_gia: 0,
+        ghi_chu: "Xuất 5 cây cắt 60 pcs cho PO2511",
+      },
+    ],
+
+    machines: [
+      {
+        id: 1,
+        machine_code: "C01",
+        machine_name: "Máy cắt 01",
+        line_id: "CUTTING",
+      },
+      {
+        id: 2,
+        machine_code: "C02",
+        machine_name: "Máy cắt 02",
+        line_id: "CUTTING",
+      },
+      {
+        id: 3,
+        machine_code: "NC-01",
+        machine_name: "Máy Mazak NC-01",
+        line_id: "NC",
+      },
+      {
+        id: 4,
+        machine_code: "NC-02",
+        machine_name: "Máy Okuma NC-02",
+        line_id: "NC",
+      },
+      {
+        id: 5,
+        machine_code: "MNC-01",
+        machine_name: "Brother MNC-01",
+        line_id: "MNC",
+      },
+      {
+        id: 6,
+        machine_code: "GS-01",
+        machine_name: "Máy Mài Okamoto GS-01",
+        line_id: "GS_GV",
+      },
+    ],
+
+    pos: [
+      {
+        po_number: "PO2510-01",
+        ma_sp: "SP001",
+        production_date: "2026-10-24",
+        total_qty: 102,
+        status: "OPEN",
+        created_by: "ADMIN",
+      },
+      {
+        po_number: "PO2510-02",
+        ma_sp: "SP001",
+        production_date: "2026-10-24",
+        total_qty: 102,
+        status: "OPEN",
+        created_by: "ADMIN",
+      },
+      {
+        po_number: "PO2511-01",
+        ma_sp: "SP002",
+        production_date: "2026-10-25",
+        total_qty: 60,
+        status: "OPEN",
+        created_by: "ADMIN",
+      },
+    ],
+
+    // Dữ liệu tồn WIP khớp 100% với stage_id mới ("CAT", "NC_1", "MNC_1")
+    sxInventory: [
+      {
+        ma_sp: "SP001",
+        lot_number: "PO2510-01",
+        stage_id: "NC_1",
+        quantity: 70,
+        updated_at: "2026-10-25 06:30:00",
+      },
+      {
+        ma_sp: "SP001",
+        lot_number: "PO2510-01",
+        stage_id: "NC_1_NG",
+        quantity: 2,
+        updated_at: "2026-10-25 07:45:00",
+      },
+      {
+        ma_sp: "SP001",
+        lot_number: "PO2510-01",
+        stage_id: "MNC_1",
+        quantity: 30,
+        updated_at: "2026-10-25 08:00:00",
+      },
+      {
+        ma_sp: "SP001",
+        lot_number: "PO2510-02",
+        stage_id: "CAT",
+        quantity: 102,
+        updated_at: "2026-10-25 07:00:00",
+      },
+      {
+        ma_sp: "SP002",
+        lot_number: "PO2511-01",
+        stage_id: "NC_1",
+        quantity: 60,
+        updated_at: "2026-10-25 07:30:00",
+      },
+    ],
+
+    machineAllocations: [
+      {
+        id: 1,
+        lot_number: "PO2510-01",
+        ma_sp: "SP001",
+        stage_id: "CAT",
+        machine_id: 1,
+        qty: 102,
+        input_date: "2026-10-24 13:00",
+        output_date: "2026-10-24 16:30",
+        status: "DONE",
+        note: "Đã cắt xong 6 cây = 102 pcs",
+        created_at: "2026-10-24 13:00:00",
+      },
+      {
+        id: 2,
+        lot_number: "PO2510-01",
+        ma_sp: "SP001",
+        stage_id: "NC_1",
+        machine_id: 3,
+        qty: 40,
+        input_date: "2026-10-25 06:40",
+        output_date: null,
+        status: "RUNNING",
+        note: "Đang tiện trên NC-01 (Còn 30 pcs đang chờ máy)",
+        created_at: "2026-10-25 06:40:00",
+      },
+      {
+        id: 3,
+        lot_number: "PO2510-02",
+        ma_sp: "SP001",
+        stage_id: "CAT",
+        machine_id: 2,
+        qty: 68,
+        input_date: "2026-10-25 07:15",
+        output_date: null,
+        status: "RUNNING",
+        note: "Đang cưa 4 cây trên C02",
+        created_at: "2026-10-25 07:15:00",
+      },
+      {
+        id: 4,
+        lot_number: "PO2511-01",
+        ma_sp: "SP002",
+        stage_id: "NC_1",
+        machine_id: 4,
+        qty: 60,
+        input_date: "2026-10-25 07:35",
+        output_date: null,
+        status: "RUNNING",
+        note: "Chạy toàn bộ 60 pcs trên NC-02",
+        created_at: "2026-10-25 07:35:00",
+      },
+    ],
+
+    sxHistory: [
+      {
+        timestamp: "2026-10-24 16:30:00",
+        user_id: "L_CUT",
+        lot_number: "PO2510-01",
+        from_stage: "CAT [Máy C01]",
+        to_stage: "NHIET_LUYEN",
+        qty: 102,
+        type: "PASS",
+      },
+      {
+        timestamp: "2026-10-25 07:45:00",
+        user_id: "L_NC",
+        lot_number: "PO2510-01",
+        from_stage: "NC_1 [Máy NC-01]",
+        to_stage: "KHO_NG",
+        qty: 2,
+        type: "NG",
+      },
+      {
+        timestamp: "2026-10-25 08:00:00",
+        user_id: "L_NC",
+        lot_number: "PO2510-01",
+        from_stage: "NC_1 [Máy NC-01]",
+        to_stage: "MNC_1",
+        qty: 30,
+        type: "PASS",
+      },
+    ],
   };
-  console.info("%c[MOCK MODE] Đang dùng dữ liệu giả lập, không gọi backend thật.", "color:#7c3aed;font-weight:bold;");
+
+  const realFetch = window.fetch.bind(window);
+
+  window.fetch = async function (input, init = {}) {
+    const urlStr = typeof input === "string" ? input : input.url;
+    const u = new URL(urlStr, location.origin);
+    const path = u.pathname;
+    const method = (init.method || "GET").toUpperCase();
+    const p = init.body ? JSON.parse(init.body) : {};
+
+    const respond = (data, status = 200) =>
+      new Response(JSON.stringify(data), {
+        status,
+        headers: { "Content-Type": "application/json" },
+      });
+    const bad = (msg, status = 400) => respond({ error: msg }, status);
+    // Các phân bổ máy đang chạy (chưa DONE/CANCELLED) của 1 LOT tại 1 công đoạn
+    const mockRunningAllocs = (lot, stageUp) =>
+      db.machineAllocations.filter(
+        (a) =>
+          a.lot_number === lot &&
+          String(a.stage_id).toUpperCase() === stageUp &&
+          a.status !== "DONE" &&
+          a.status !== "CANCELLED",
+      );
+    const mockLineHasMachines = (lineId) =>
+      !!lineId &&
+      db.machines.some(
+        (m) =>
+          String(m.line_id).toUpperCase() === String(lineId).toUpperCase() &&
+          m.is_active !== 0,
+      );
+
+    if (!path.startsWith("/api/")) return realFetch(input, init);
+
+    // 1. AUTH
+    if (path === "/api/login" && method === "POST") {
+      const maNv = String(p.ma_nv || "")
+        .toUpperCase()
+        .trim();
+      const user = db.users.find(
+        (x) => x.ma_nv === maNv && x.password === String(p.password || ""),
+      );
+      if (!user)
+        return bad("Sai tài khoản hoặc mật khẩu (Gợi ý: mật khẩu là 123)", 401);
+      return respond(user);
+    }
+
+    // 2. KHO NVL BOOTSTRAP & DANH MỤC NVL / NCC / BOM / TỶ LỆ CẮT
+    if (path === "/api/kho/bootstrap" && method === "GET") {
+      const items = db.items
+        .filter((i) => i.trang_thai !== "INACTIVE")
+        .map((it) => {
+          const nhap = db.khoTransactions
+            .filter(
+              (t) =>
+                t.ma_hang === it.ma_hang && t.loai_giao_dich === "NHAP_KHO",
+            )
+            .reduce((s, t) => s + Number(t.so_luong), 0);
+          const xuat = db.khoTransactions
+            .filter(
+              (t) =>
+                t.ma_hang === it.ma_hang &&
+                t.loai_giao_dich === "XUAT_SAN_XUAT",
+            )
+            .reduce((s, t) => s + Number(t.so_luong), 0);
+          return { ...it, tong_nhap: nhap, tong_xuat_sx: xuat };
+        });
+      const boms = db.boms.map((b) => {
+        const it = db.items.find((i) => i.ma_hang === b.ma_hang) || {};
+        return {
+          ...b,
+          ten_hang: it.ten_hang,
+          phan_loai: it.phan_loai,
+          quy_cach: it.quy_cach,
+          don_vi_tinh: it.don_vi_tinh,
+        };
+      });
+      const cutRatios = db.cutRatios.map((c) => {
+        const it = db.items.find((i) => i.ma_hang === c.ma_hang) || {};
+        return {
+          ...c,
+          ten_hang: it.ten_hang,
+          chieu_dai_chuan_m: it.chieu_dai_chuan_m,
+          he_so_kg_m: it.he_so_kg_m,
+        };
+      });
+      return respond({
+        items,
+        nccs: db.nccs.filter((n) => n.active !== 0),
+        products: db.products.filter((pr) => pr.active !== 0),
+        boms,
+        cutRatios,
+      });
+    }
+
+    if (path === "/api/kho/items" && method === "POST") {
+      if (!p.phan_loai || !p.ten_hang)
+        return bad("Vui lòng nhập Phân loại và Tên NVL.");
+      const maxNo = db.items.reduce(
+        (m, it) =>
+          Math.max(m, parseInt(String(it.ma_hang).replace(/\D/g, "")) || 0),
+        0,
+      );
+      const ma_hang = `NVL${String(maxNo + 1).padStart(3, "0")}`;
+      db.items.push({
+        ma_hang,
+        phan_loai: p.phan_loai.trim(),
+        ten_hang: p.ten_hang.trim(),
+        quy_cach: p.quy_cach || "",
+        don_vi_tinh: p.don_vi_tinh || "Cây",
+        ma_ncc: p.ma_ncc || "",
+        ghi_chu: p.ghi_chu || "",
+        he_so_kg_m: Number(p.he_so_kg_m || 0),
+        chieu_dai_chuan_m: Number(p.chieu_dai_chuan_m || 0),
+        ma_goc: p.ma_goc || "",
+        ton_kho: 0,
+        ton_xuong: 0,
+        trang_thai: "ACTIVE",
+      });
+      return respond({ success: true, ma_hang });
+    }
+
+    if (path === "/api/kho/items/edit" && method === "POST") {
+      const it = db.items.find((x) => x.ma_hang === p.ma_hang);
+      if (!it) return bad("Không tìm thấy NVL");
+      Object.assign(it, {
+        phan_loai: p.phan_loai,
+        ten_hang: p.ten_hang,
+        quy_cach: p.quy_cach,
+        don_vi_tinh: p.don_vi_tinh,
+        he_so_kg_m: Number(p.he_so_kg_m || 0),
+        chieu_dai_chuan_m: Number(p.chieu_dai_chuan_m || 0),
+        ma_goc: p.ma_goc || "",
+      });
+      return respond({ success: true });
+    }
+
+    if (path === "/api/kho/items/delete" && method === "POST") {
+      db.items = db.items.filter((x) => x.ma_hang !== p.ma_hang);
+      return respond({ success: true });
+    }
+
+    if (path === "/api/kho/suppliers" && method === "POST") {
+      const ma_ncc = `NCC${String(db.nccs.length + 1).padStart(3, "0")}`;
+      db.nccs.push({
+        ma_ncc,
+        ten_ncc: p.ten_ncc,
+        dia_chi: p.dia_chi || "",
+        so_dt: p.so_dt || "",
+        nguoi_lien_he: p.nguoi_lien_he || "",
+        email: p.email || "",
+        ghi_chu: p.ghi_chu || "",
+        active: 1,
+      });
+      return respond({ success: true, ma_ncc });
+    }
+    if (path === "/api/kho/suppliers/edit" && method === "POST") {
+      const sup = db.nccs.find((x) => x.ma_ncc === p.ma_ncc);
+      if (sup) Object.assign(sup, p);
+      return respond({ success: true });
+    }
+    if (path === "/api/kho/suppliers/delete" && method === "POST") {
+      db.nccs = db.nccs.filter((x) => x.ma_ncc !== p.ma_ncc);
+      return respond({ success: true });
+    }
+
+    if (path === "/api/kho/bom/save" && method === "POST") {
+      const idx = db.boms.findIndex(
+        (b) => b.ma_sp === p.ma_sp && b.ma_hang === p.ma_hang,
+      );
+      if (idx >= 0)
+        db.boms[idx] = {
+          ...db.boms[idx],
+          dinh_muc: Number(p.dinh_muc || 0),
+          ghi_chu: p.ghi_chu || "",
+        };
+      else
+        db.boms.push({
+          id: Date.now(),
+          ma_sp: p.ma_sp,
+          ma_hang: p.ma_hang,
+          dinh_muc: Number(p.dinh_muc || 0),
+          ghi_chu: p.ghi_chu || "",
+        });
+      return respond({ success: true });
+    }
+    if (path === "/api/kho/bom/delete" && method === "POST") {
+      db.boms = db.boms.filter(
+        (b) => !(b.ma_sp === p.ma_sp && b.ma_hang === p.ma_hang),
+      );
+      return respond({ success: true });
+    }
+
+    if (path === "/api/kho/cat-ratio/save" && method === "POST") {
+      const idx = db.cutRatios.findIndex(
+        (c) => c.ma_sp === p.ma_sp && c.ma_hang === p.ma_hang,
+      );
+      if (idx >= 0)
+        db.cutRatios[idx] = {
+          ...db.cutRatios[idx],
+          so_con_moi_cay: Number(p.so_con_moi_cay),
+          ghi_chu: p.ghi_chu,
+        };
+      else
+        db.cutRatios.push({
+          id: Date.now(),
+          ma_sp: p.ma_sp,
+          ma_hang: p.ma_hang,
+          so_con_moi_cay: Number(p.so_con_moi_cay),
+          ghi_chu: p.ghi_chu,
+        });
+      return respond({ success: true });
+    }
+    if (path === "/api/kho/cat-ratio/delete" && method === "POST") {
+      db.cutRatios = db.cutRatios.filter(
+        (c) => !(c.ma_sp === p.ma_sp && c.ma_hang === p.ma_hang),
+      );
+      return respond({ success: true });
+    }
+
+    // 3. GIAO DỊCH KHO NVL & BÁO CÁO
+    if (path === "/api/kho/transactions" && method === "POST") {
+      const nowTime = new Date().toTimeString().slice(0, 8);
+      for (const tx of p.transactions || []) {
+        const it = db.items.find((i) => i.ma_hang === tx.ma_hang);
+        if (!it) continue;
+        if (
+          tx.loai_giao_dich === "NHAP_KHO" ||
+          tx.loai_giao_dich === "HOAN_TRA_XUONG"
+        )
+          it.ton_kho += Number(tx.so_luong);
+        else it.ton_kho -= Number(tx.so_luong);
+
+        db.khoTransactions.unshift({
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          thoi_gian_gd: `${p.tx_date} ${nowTime}`,
+          nguoi_giao_dich: p.user_id,
+          ...tx,
+        });
+      }
+      return respond({ success: true });
+    }
+
+    if (path === "/api/kho/history" && method === "GET") {
+      const rows = db.khoTransactions.map((g) => {
+        const d = db.items.find((i) => i.ma_hang === g.ma_hang) || {};
+        const u = db.users.find((x) => x.ma_nv === g.nguoi_giao_dich) || {};
+        const s = db.products.find((x) => x.ma_sp === g.ma_sp_sx) || {};
+        const n = db.nccs.find((x) => x.ma_ncc === g.ma_ncc) || {};
+        return {
+          ...g,
+          ten_hang: d.ten_hang,
+          phan_loai: d.phan_loai,
+          don_vi_tinh: d.don_vi_tinh,
+          ten_nv: u.ten_nv,
+          bo_phan: u.bo_phan,
+          ten_sp: s.ten_sp,
+          ten_ncc: n.ten_ncc,
+        };
+      });
+      return respond({ rows });
+    }
+
+    if (path === "/api/kho/report/daily" && method === "GET") {
+      const rows = db.items.map((d) => {
+        const txs = db.khoTransactions.filter((g) => g.ma_hang === d.ma_hang);
+        const nhap = txs
+          .filter((g) => g.loai_giao_dich === "NHAP_KHO")
+          .reduce((s, g) => s + Number(g.so_luong), 0);
+        const xuat_sx = txs
+          .filter((g) => g.loai_giao_dich === "XUAT_SAN_XUAT")
+          .reduce((s, g) => s + Number(g.so_luong), 0);
+        const tong_kg_nhap = txs
+          .filter((g) => g.loai_giao_dich === "NHAP_KHO")
+          .reduce((s, g) => s + Number(g.khoi_luong_kg || 0), 0);
+        const tong_kg_xuat = txs
+          .filter((g) => g.loai_giao_dich === "XUAT_SAN_XUAT")
+          .reduce((s, g) => s + Number(g.khoi_luong_kg || 0), 0);
+        const tong_pcs_xuat = txs
+          .filter(
+            (g) => g.loai_giao_dich === "XUAT_SAN_XUAT" && g.dvt_phu === "pcs",
+          )
+          .reduce((s, g) => s + Number(g.sl_phu || 0), 0);
+        return {
+          ma_hang: d.ma_hang,
+          ten_hang: d.ten_hang,
+          phan_loai: d.phan_loai,
+          don_vi_tinh: d.don_vi_tinh,
+          chieu_dai_chuan_m: d.chieu_dai_chuan_m,
+          he_so_kg_m: d.he_so_kg_m,
+          nhap,
+          xuat_sx,
+          tong_kg_nhap,
+          tong_kg_xuat,
+          tong_pcs_xuat,
+          gd_gan_nhat: txs[0]?.thoi_gian_gd || null,
+          ton_kho: d.ton_kho,
+        };
+      });
+      const total = {
+        nhap: rows.reduce((s, r) => s + r.nhap, 0),
+        xuat_sx: rows.reduce((s, r) => s + r.xuat_sx, 0),
+      };
+      return respond({
+        rows,
+        total,
+        chart_by_product: [],
+        chart_by_category: [],
+      });
+    }
+
+    if (path === "/api/kho/report/detail" && method === "GET") {
+      const maHang = u.searchParams.get("ma_hang");
+      const rows = db.khoTransactions
+        .filter((g) => !maHang || g.ma_hang === maHang)
+        .map((g) => {
+          const s = db.products.find((x) => x.ma_sp === g.ma_sp_sx) || {};
+          const usr = db.users.find((x) => x.ma_nv === g.nguoi_giao_dich) || {};
+          return {
+            ...g,
+            loai_hien_thi: g.loai_giao_dich,
+            ten_sp: s.ten_sp,
+            ten_nv: usr.ten_nv,
+          };
+        });
+      return respond({ rows });
+    }
+
+    // 4. SẢN XUẤT & DÙNG CHUNG
+    if (path === "/api/products" && method === "GET")
+      return respond({ products: db.products });
+    if (path === "/api/products" && method === "POST") {
+      if (!p.ten_sp) return bad("Tên mã hàng là bắt buộc.");
+      const hasCode = (c) =>
+        db.products.some(
+          (x) => String(x.ma_sp || "").toUpperCase() === String(c).toUpperCase(),
+        );
+      let ma_sp = String(p.ma_sp || "").trim().toUpperCase();
+      if (!ma_sp) {
+        let n = db.products.length + 1;
+        while (hasCode(`SP${String(n).padStart(3, "0")}`)) n++;
+        ma_sp = `SP${String(n).padStart(3, "0")}`;
+      }
+      if (hasCode(ma_sp)) return bad(`Mã sản phẩm '${ma_sp}' đã tồn tại.`);
+      db.products.push({
+        ma_sp,
+        ten_sp: p.ten_sp,
+        quy_cach: p.quy_cach || "",
+        don_vi_tinh: p.don_vi_tinh || "PCS",
+        routing_map: p.routing_map ? JSON.stringify(p.routing_map) : null,
+        ghi_chu: p.ghi_chu || "",
+        active: 1,
+      });
+      return respond({ success: true, ma_sp });
+    }
+
+    if (path === "/api/stages" && method === "GET")
+      return respond({ data: db.stages });
+    if (path === "/api/stages" && method === "POST") {
+      db.stages.push({
+        stage_id: p.stage_id.toUpperCase(),
+        line_id: p.line_id.toUpperCase(),
+        stage_name: p.stage_name,
+        display_order: db.stages.length + 1,
+      });
+      return respond({ success: true });
+    }
+
+    if (path === "/api/lines" && method === "GET")
+      return respond({ data: db.lines });
+    if (path === "/api/lines" && method === "POST") {
+      db.lines.push({
+        line_id: p.line_id.toUpperCase(),
+        line_name: p.line_name,
+        display_order: db.lines.length + 1,
+      });
+      return respond({ success: true });
+    }
+
+    if (path === "/api/machines" && method === "GET")
+      return respond({ data: db.machines });
+    if (path === "/api/machines" && method === "POST") {
+      db.machines.push({
+        id: Date.now(),
+        machine_code: p.machine_code.toUpperCase(),
+        machine_name: p.machine_name || "",
+        line_id: p.line_id.toUpperCase(),
+      });
+      return respond({ success: true });
+    }
+
+    if (path === "/api/sx/po/create" && method === "POST") {
+      const prod = db.products.find((x) => x.ma_sp === p.product_code);
+      if (!prod) return bad("Mã SP chưa tồn tại");
+      const rMap = JSON.parse(prod.routing_map || "[]");
+      const firstStage = rMap[0]?.stage_id || "CAT";
+      db.pos.push({
+        po_number: p.po_number,
+        ma_sp: p.product_code,
+        production_date: p.production_date,
+        total_qty: Number(p.total_qty),
+        status: "OPEN",
+      });
+      db.sxInventory.push({
+        ma_sp: p.product_code,
+        lot_number: p.po_number,
+        stage_id: firstStage,
+        quantity: Number(p.total_qty),
+        updated_at: new Date().toISOString().slice(0, 19).replace("T", " "),
+      });
+      return respond({ success: true });
+    }
+
+    if (path === "/api/sx/dashboard/matrix" && method === "GET") {
+      const lots = [
+        ...new Set(
+          db.sxInventory.filter((i) => i.quantity > 0).map((i) => i.lot_number),
+        ),
+      ];
+      const matrix = lots.map((lot) => {
+        const items = db.sxInventory.filter((i) => i.lot_number === lot);
+        const po = db.pos.find((x) => x.po_number === lot) || {};
+        const sp =
+          db.products.find((x) => x.ma_sp === (items[0]?.ma_sp || po.ma_sp)) ||
+          {};
+        const row = {
+          lot_number: lot,
+          product_code: sp.ma_sp || items[0]?.ma_sp,
+          product_name: sp.ten_sp || "",
+          production_date: po.production_date || "2026-10-25",
+          total_qty: items.reduce((s, i) => s + Number(i.quantity), 0),
+          qty_done: items
+            .filter((i) => i.stage_id === "THANH_PHAM")
+            .reduce((s, i) => s + Number(i.quantity), 0),
+        };
+        db.stages.forEach((st) => {
+          const key = st.stage_id.toLowerCase();
+          const goodItem = items.find(
+            (i) =>
+              String(i.stage_id).toUpperCase() ===
+              String(st.stage_id).toUpperCase(),
+          );
+          const ngItem = items.find(
+            (i) =>
+              String(i.stage_id).toUpperCase() ===
+              `${String(st.stage_id).toUpperCase()}_NG`,
+          );
+          row[`qty_${key}`] = goodItem ? goodItem.quantity : 0;
+          row[`ng_${key}`] = ngItem ? ngItem.quantity : 0;
+          row[`date_${key}`] = goodItem ? goodItem.updated_at : null;
+        });
+        return row;
+      });
+
+      const allocations = db.machineAllocations.map((ma) => {
+        const m = db.machines.find((x) => x.id === Number(ma.machine_id)) || {};
+        const sp = db.products.find((x) => x.ma_sp === ma.ma_sp) || {};
+        return {
+          ...ma,
+          machine_code: m.machine_code,
+          machine_name: m.machine_name,
+          line_id: m.line_id,
+          ten_sp: sp.ten_sp,
+        };
+      });
+      return respond({ matrix, allocations });
+    }
+
+    if (path === "/api/sx/leader/pending" && method === "GET") {
+      const lineId = (u.searchParams.get("line_id") || "").toUpperCase();
+      const validStages = db.stages
+        .filter((s) => s.line_id === lineId)
+        .map((s) => s.stage_id.toUpperCase());
+      const rows = db.sxInventory
+        .filter(
+          (i) =>
+            validStages.includes(String(i.stage_id).toUpperCase()) &&
+            i.quantity > 0,
+        )
+        .map((i) => {
+          const sp = db.products.find((pr) => pr.ma_sp === i.ma_sp) || {};
+          let to_stage_name = "THANH_PHAM";
+          if (sp.routing_map) {
+            const rMap = JSON.parse(sp.routing_map);
+            const idx = rMap.findIndex(
+              (s) =>
+                String(s.stage_id).toUpperCase() ===
+                String(i.stage_id).toUpperCase(),
+            );
+            if (idx !== -1 && idx < rMap.length - 1)
+              to_stage_name = rMap[idx + 1].stage_id;
+          }
+          const active_machines = db.machineAllocations
+            .filter(
+              (a) =>
+                a.lot_number === i.lot_number &&
+                String(a.stage_id).toUpperCase() ===
+                  String(i.stage_id).toUpperCase() &&
+                a.status !== "DONE",
+            )
+            .map((a) => {
+              const m =
+                db.machines.find((x) => x.id === Number(a.machine_id)) || {};
+              return {
+                ...a,
+                machine_code: m.machine_code,
+                machine_name: m.machine_name,
+              };
+            });
+          return {
+            po_id: i.lot_number,
+            po_number: i.lot_number,
+            product_id: i.ma_sp,
+            product_code: i.ma_sp,
+            ten_sp: sp.ten_sp,
+            routing_map: sp.routing_map,
+            from_stage: i.stage_id,
+            qty_available: i.quantity,
+            stage_in_time: i.updated_at,
+            to_stage_name,
+            active_machines,
+            line_has_machines: mockLineHasMachines(lineId),
+          };
+        });
+      return respond({ data: rows });
+    }
+
+    if (path === "/api/leader/machine-allocations" && method === "GET") {
+      const lot = u.searchParams.get("lot_number");
+      const stageId = (u.searchParams.get("stage_id") || "").toUpperCase();
+      const data = db.machineAllocations
+        .filter(
+          (a) =>
+            a.lot_number === lot &&
+            (!stageId || String(a.stage_id).toUpperCase() === stageId),
+        )
+        .map((a) => {
+          const m =
+            db.machines.find((x) => x.id === Number(a.machine_id)) || {};
+          const sp = db.products.find((x) => x.ma_sp === a.ma_sp) || {};
+          return {
+            ...a,
+            machine_code: m.machine_code,
+            machine_name: m.machine_name,
+            ten_sp: sp.ten_sp,
+          };
+        });
+      return respond({ data });
+    }
+
+    if (path === "/api/machine-allocations" && method === "POST") {
+      const stageUp = String(p.stage_id || "").toUpperCase();
+      const qty = Number(p.qty);
+      if (!p.lot_number || !stageUp || !p.machine_id || !(qty > 0))
+        return bad("Thiếu LOT, công đoạn, máy hoặc số lượng không hợp lệ.");
+      const invAt = db.sxInventory.find(
+        (i) =>
+          i.lot_number === p.lot_number &&
+          String(i.stage_id).toUpperCase() === stageUp,
+      );
+      const allocatedAt = mockRunningAllocs(p.lot_number, stageUp).reduce(
+        (s, a) => s + Number(a.qty || 0),
+        0,
+      );
+      const remainingAt = Number(invAt?.quantity || 0) - allocatedAt;
+      if (qty > remainingAt)
+        return bad(
+          `Số lượng phân bổ (${qty}) vượt quá phần tồn chưa phân máy (${remainingAt}).`,
+        );
+      db.machineAllocations.unshift({
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        lot_number: p.lot_number,
+        ma_sp: p.ma_sp,
+        stage_id: p.stage_id,
+        machine_id: Number(p.machine_id),
+        qty: Number(p.qty),
+        input_date:
+          p.input_date ||
+          new Date().toISOString().slice(0, 16).replace("T", " "),
+        output_date: p.output_date || null,
+        status: "RUNNING",
+        created_at: new Date().toISOString().slice(0, 19).replace("T", " "),
+      });
+      return respond({ success: true });
+    }
+
+    if (path === "/api/sx/move" && method === "POST") {
+      const inv = db.sxInventory.find(
+        (i) =>
+          i.lot_number === p.lot_number &&
+          String(i.stage_id).toUpperCase() ===
+            String(p.from_stage).toUpperCase(),
+      );
+      const qPass = Number(p.qty_pass || 0);
+      const qNg = Number(p.qty_ng || 0);
+      const total = qPass + qNg;
+      if (!inv || inv.quantity < total) return bad("Số lượng tồn không đủ!");
+
+      // Bắt buộc phân bổ máy trước khi giao (trừ khi Line không có máy nào)
+      const fromStageUp = String(p.from_stage).toUpperCase();
+      const stageLine = (
+        db.stages.find((s) => String(s.stage_id).toUpperCase() === fromStageUp) ||
+        {}
+      ).line_id;
+      const lineHasMachines = mockLineHasMachines(stageLine);
+      const runningAllocs = lineHasMachines
+        ? mockRunningAllocs(p.lot_number, fromStageUp).sort(
+            (a, b) =>
+              String(a.input_date || "").localeCompare(String(b.input_date || "")) ||
+              a.id - b.id,
+          )
+        : [];
+      if (lineHasMachines) {
+        const allocatedTotal = runningAllocs.reduce(
+          (s, a) => s + Number(a.qty || 0),
+          0,
+        );
+        if (allocatedTotal <= 0)
+          return bad(
+            "LOT này chưa được phân bổ máy tại công đoạn hiện tại. Vui lòng Chia Xuống Máy trước khi giao.",
+          );
+        if (total > allocatedTotal)
+          return bad(
+            `Số lượng thao tác (${total}) vượt quá số lượng đang chạy trên máy (${allocatedTotal}). Vui lòng phân bổ thêm máy.`,
+          );
+      }
+      inv.quantity -= total;
+
+      const sp = db.products.find((x) => x.ma_sp === inv.ma_sp) || {};
+      let nextStage = "THANH_PHAM";
+      if (sp.routing_map) {
+        const rMap = JSON.parse(sp.routing_map);
+        const idx = rMap.findIndex(
+          (s) =>
+            String(s.stage_id).toUpperCase() ===
+            String(p.from_stage).toUpperCase(),
+        );
+        if (idx !== -1 && idx < rMap.length - 1)
+          nextStage = rMap[idx + 1].stage_id;
+      }
+
+      const nowStr = new Date().toISOString().slice(0, 16).replace("T", " ");
+      // Tự trừ SL trên các máy theo thứ tự nhận hàng trước (FIFO) và chốt giờ hoàn thành
+      let machineNote = "";
+      let left = total;
+      const usedMachines = [];
+      for (const alloc of runningAllocs) {
+        if (left <= 0) break;
+        const take = Math.min(left, Number(alloc.qty || 0));
+        if (take <= 0) continue;
+        left -= take;
+        const m =
+          db.machines.find((x) => x.id === Number(alloc.machine_id)) || {};
+        if (m.machine_code && !usedMachines.includes(m.machine_code))
+          usedMachines.push(m.machine_code);
+        if (take >= Number(alloc.qty)) {
+          alloc.status = "DONE";
+          alloc.output_date = nowStr;
+        } else {
+          alloc.qty -= take;
+          db.machineAllocations.unshift({
+            ...alloc,
+            id: Date.now() + Math.floor(Math.random() * 1000),
+            qty: take,
+            output_date: nowStr,
+            status: "DONE",
+            note: "Hoàn thành 1 phần",
+          });
+        }
+      }
+      if (usedMachines.length > 0)
+        machineNote = ` [Máy ${usedMachines.join(", ")}]`;
+
+      // Khi giao hết SL của LOT tại công đoạn này -> tự động chốt hoàn thành (DONE) tất cả máy của LOT ở khâu này
+      if (inv.quantity <= 0) {
+        db.machineAllocations.forEach((a) => {
+          if (
+            a.lot_number === p.lot_number &&
+            String(a.stage_id).toUpperCase() ===
+              String(p.from_stage).toUpperCase() &&
+            a.status !== "DONE"
+          ) {
+            a.status = "DONE";
+            a.output_date = nowStr;
+          }
+        });
+      }
+
+      if (qPass > 0) {
+        const target = db.sxInventory.find(
+          (i) =>
+            i.lot_number === p.lot_number &&
+            String(i.stage_id).toUpperCase() ===
+              String(nextStage).toUpperCase(),
+        );
+        if (target) target.quantity += qPass;
+        else
+          db.sxInventory.push({
+            ma_sp: inv.ma_sp,
+            lot_number: p.lot_number,
+            stage_id: nextStage,
+            quantity: qPass,
+            updated_at: nowStr,
+          });
+        db.sxHistory.unshift({
+          timestamp: nowStr + ":00",
+          user_id: p.user_id,
+          lot_number: p.lot_number,
+          from_stage: p.from_stage + machineNote,
+          to_stage: nextStage,
+          qty: qPass,
+          type: "PASS",
+        });
+      }
+      if (qNg > 0) {
+        const ngStage = `${p.from_stage}_NG`;
+        const targetNg = db.sxInventory.find(
+          (i) =>
+            i.lot_number === p.lot_number &&
+            String(i.stage_id).toUpperCase() === ngStage.toUpperCase(),
+        );
+        if (targetNg) targetNg.quantity += qNg;
+        else
+          db.sxInventory.push({
+            ma_sp: inv.ma_sp,
+            lot_number: p.lot_number,
+            stage_id: ngStage,
+            quantity: qNg,
+            updated_at: nowStr,
+          });
+        db.sxHistory.unshift({
+          timestamp: nowStr + ":00",
+          user_id: p.user_id,
+          lot_number: p.lot_number,
+          from_stage: p.from_stage + machineNote,
+          to_stage: "KHO_NG",
+          qty: qNg,
+          type: "NG",
+        });
+      }
+      return respond({ success: true });
+    }
+
+    if (path === "/api/sx/ng/list" && method === "GET") {
+      const ngList = db.sxInventory
+        .filter(
+          (i) =>
+            String(i.stage_id).toUpperCase().endsWith("_NG") && i.quantity > 0,
+        )
+        .map((i) => {
+          const sp = db.products.find((x) => x.ma_sp === i.ma_sp) || {};
+          return {
+            lot_number: i.lot_number,
+            product_code: i.ma_sp,
+            product_name: sp.ten_sp,
+            from_stage: String(i.stage_id).replace(/_NG$/i, ""),
+            ng_qty: i.quantity,
+          };
+        });
+      return respond({ data: ngList });
+    }
+
+    if (path === "/api/sx/ng/resolve" && method === "POST") {
+      const ngStage = `${p.from_stage}_NG`;
+      const ngItem = db.sxInventory.find(
+        (i) =>
+          i.lot_number === p.lot_number &&
+          String(i.stage_id).toUpperCase() === ngStage.toUpperCase(),
+      );
+      const qty = Number(p.qty || 0);
+      if (!ngItem || ngItem.quantity < qty)
+        return bad("Số lượng NG không đủ để xử lý!");
+      ngItem.quantity -= qty;
+
+      const nowStr = new Date().toISOString().slice(0, 16).replace("T", " ");
+      if (p.action === "REWORK" && p.return_stage) {
+        const target = db.sxInventory.find(
+          (i) =>
+            i.lot_number === p.lot_number &&
+            String(i.stage_id).toUpperCase() ===
+              String(p.return_stage).toUpperCase(),
+        );
+        if (target) target.quantity += qty;
+        else
+          db.sxInventory.push({
+            ma_sp: ngItem.ma_sp,
+            lot_number: p.lot_number,
+            stage_id: p.return_stage,
+            quantity: qty,
+            updated_at: nowStr,
+          });
+      }
+      db.sxHistory.unshift({
+        timestamp: nowStr + ":00",
+        user_id: p.user_id,
+        lot_number: p.lot_number,
+        from_stage: ngStage,
+        to_stage: p.action === "REWORK" ? p.return_stage : "SCRAP (Báo hủy)",
+        qty,
+        type: "NG",
+      });
+      return respond({ success: true });
+    }
+
+    if (path === "/api/sx/history" && method === "GET") {
+      const data = db.sxHistory.map((h) => {
+        const po = db.pos.find((x) => x.po_number === h.lot_number) || {};
+        const sp = db.products.find((x) => x.ma_sp === po.ma_sp) || {};
+        const u = db.users.find((x) => x.ma_nv === h.user_id) || {};
+        return {
+          ...h,
+          po_id: h.lot_number,
+          username: h.user_id,
+          ten_nv: u.ten_nv,
+          product_code: sp.ma_sp || "SP001",
+          product_name: sp.ten_sp || "",
+        };
+      });
+      return respond({ data });
+    }
+
+    return respond({ success: true });
+  };
 }
